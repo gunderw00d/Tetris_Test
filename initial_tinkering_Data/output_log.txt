@@ -8,9 +8,13 @@ Direct3D:
 Begin MonoManager ReloadAssembly
 Platform assembly: C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\UnityEngine.dll (this message is harmless)
 Loading C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\Assembly-UnityScript.dll (this message is harmless)
+Loading C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\Assembly-UnityScript.dll into Unity Child Domain
 Platform assembly: C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\UnityEngine.UI.dll (this message is harmless)
 Loading C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  0.106 seconds
+- Completed reload, in  0.142 seconds
 desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
