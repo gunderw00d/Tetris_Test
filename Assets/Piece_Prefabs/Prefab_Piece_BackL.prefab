@@ -72,6 +72,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 404262}
+  - 114: {fileID: 11494666}
   m_Layer: 0
   m_Name: Prefab_Piece_BackL
   m_TagString: Untagged
@@ -143,6 +144,21 @@ Transform:
   - {fileID: 404260}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!114 &11494666
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 104262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9d5cbab62ec08648a946b3fb63575c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  kWaitFramesBeforeDropping: 45
+  FrameCount: 0
+  yStep: -1
+  BottomYValue: 2
 --- !u!212 &21204256
 SpriteRenderer:
   m_ObjectHideFlags: 1
