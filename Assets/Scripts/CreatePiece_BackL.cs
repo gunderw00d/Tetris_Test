@@ -5,14 +5,16 @@ public class CreatePiece_BackL : MonoBehaviour {
 
 	public Transform Piece;
 	public Transform StartLocation;
+	public Transform TileContainer;
 
 	// Use this for initialization
-	void Start () {
+	void Start()
+	{
 	
 	}
 	
 	// Update is called once per frame
-	void Update ()
+	void Update()
 	{
 		// INITIAL TESTING --
 		// Press space to create piece
@@ -21,7 +23,9 @@ public class CreatePiece_BackL : MonoBehaviour {
 
 		if (createPiece)
 		{
-			Instantiate(Piece, StartLocation.transform.position, Quaternion.identity);
+			Transform newPiece = Instantiate(Piece, StartLocation.transform.position, Quaternion.identity) as Transform;
+			Drop dropScript = newPiece.gameObject.GetComponent<Drop>(); 
+			dropScript.TileContainer = TileContainer;
 		}
 		
 	

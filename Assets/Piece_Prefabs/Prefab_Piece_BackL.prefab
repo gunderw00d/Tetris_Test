@@ -159,6 +159,8 @@ MonoBehaviour:
   FrameCount: 0
   yStep: -1
   BottomYValue: 2
+  IndividualTile: {fileID: 411392, guid: 4883048537aadd8499ccff0157b0ed9a, type: 2}
+  TileContainer: {fileID: 0}
 --- !u!212 &21204256
 SpriteRenderer:
   m_ObjectHideFlags: 1

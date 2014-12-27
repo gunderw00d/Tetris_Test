@@ -7,15 +7,17 @@ public class Drop : MonoBehaviour {
 	public int FrameCount = 0;
 	public float yStep = -1;
 	public float BottomYValue = 2;
+	public Transform IndividualTile;
+	public Transform TileContainer;
 	
 	// Use this for initialization
-	void Start ()
+	void Start()
 	{
 		FrameCount = 0;
 	}
 	
 	// Update is called once per frame
-	void Update ()
+	void Update()
 	{
 		// TODO -- input handling - rotate, shift left/right
 		// TODO -- needs to know what other tiles are on the board.
@@ -33,9 +35,24 @@ public class Drop : MonoBehaviour {
 			{
 				transform.Translate(0, yStep, 0);
 			}
-			// else -- TODO -- instantiate a set of separate tiles where this piece's tiles are
-			//      -- TODO -- demolish this piece.
-			//      -- TODO -- write script to look for completed rows & handle removal.
+			else
+			{
+				Component[] tileXForms;
+			
+				tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
+				foreach (Transform t in tileXForms)
+				{
+					if (t.gameObject != this.gameObject)
+					{
+						Vector3 newLoc = transform.position;
+						newLoc = newLoc + t.localPosition;
+						Transform tileInstance = Instantiate(IndividualTile, newLoc, Quaternion.identity) as Transform;
+						tileInstance.gameObject.transform.parent = TileContainer.gameObject.transform;
+					}
+				}
+		
+				Destroy(this.gameObject);
+			}
 		}
 	}
 }
