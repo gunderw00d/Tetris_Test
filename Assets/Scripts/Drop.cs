@@ -31,6 +31,7 @@ public class Drop : MonoBehaviour {
 			FrameCount = 0;
 			float tempY = transform.position.y;
 			
+			// TODO -- test for intersection with other, loose tiles.
 			if (tempY > BottomYValue)
 			{
 				transform.Translate(0, yStep, 0);
