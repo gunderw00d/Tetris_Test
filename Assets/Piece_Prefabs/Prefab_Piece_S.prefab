@@ -8,6 +8,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 486850}
+  - 114: {fileID: 11474924}
   m_Layer: 0
   m_Name: Prefab_Piece_S
   m_TagString: Untagged
@@ -143,6 +144,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 486850}
   m_RootOrder: 0
+--- !u!114 &11474924
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 186850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9d5cbab62ec08648a946b3fb63575c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  kWaitFramesBeforeDropping: 10
+  FrameCount: 0
+  yStep: -1
+  BottomYValue: 2
+  IndividualTile: {fileID: 426942, guid: 56435813c701ad34b818960c912d552f, type: 2}
+  TileContainer: {fileID: 0}
+  MainLoopScriptObject: {fileID: 0}
 --- !u!212 &21286850
 SpriteRenderer:
   m_ObjectHideFlags: 1

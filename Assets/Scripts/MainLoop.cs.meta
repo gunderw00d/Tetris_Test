@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 2923f7edd6ae2754fb80532c7707d08b
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - Piece_BackL: {instanceID: 0}
+  - Piece_L: {instanceID: 0}
+  - Piece_Long: {instanceID: 0}
+  - Piece_S: {instanceID: 0}
+  - Piece_Sqaure: {instanceID: 0}
+  - Piece_T: {instanceID: 0}
+  - Piece_Z: {instanceID: 0}
+  - StartLocation: {instanceID: 0}
+  - TileContainer: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 

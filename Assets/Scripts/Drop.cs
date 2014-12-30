@@ -10,6 +10,8 @@ public class Drop : MonoBehaviour {
 	public Transform IndividualTile;
 	public Transform TileContainer;
 	
+	public GameObject MainLoopScriptObject;
+	
 	// Use this for initialization
 	void Start()
 	{
