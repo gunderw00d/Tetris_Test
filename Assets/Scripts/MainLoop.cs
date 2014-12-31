@@ -6,6 +6,8 @@ public class MainLoop : MonoBehaviour
 	public int BoardHeight;
 	public int BoardWidth;
 	
+	// TODO -- create grid of piece locations... so's we can test for complete rows, etc.
+	
 	public Transform Piece_BackL;
 	public Transform Piece_L;
 	public Transform Piece_Long;
@@ -83,16 +85,39 @@ public class MainLoop : MonoBehaviour
 		dropScript.MainLoopScriptObject = this.gameObject;
 	}
 	
+	//  TODO -- turn this into a function to register individual pieces on the grid.
+	public void DoIt()
+	{
+		Create_Z();
+	}
 	
+	public bool SquareOpen()	// TODO -- test if a given location is available
+	{
+		return true;	// TODO!
+	}
+		
+	void CheckForCompleteLines()
+	{
+	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
+		// TODO -- decide if it's time to drop a piece
+		//         handle game pause -- or not?  Maybe something else just pauses this and the Drop script?
+		//  TODO -- preview next piece to drop while waiting.
+		
+		
+		// PLACEHOLDER/TEST STUFF!
 		bool createPiece = Input.GetKeyUp("space");
 		
 		if (createPiece)
 		{
 			Create_BackL();
 		}
+		
+		CheckForCompleteLines();
+		
+		// TODO -- level up - speed up drop rate
 	}
 }

@@ -21,8 +21,7 @@ public class Drop : MonoBehaviour {
 	// Update is called once per frame
 	void Update()
 	{
-		// TODO -- input handling - rotate, shift left/right
-		// TODO -- needs to know what other tiles are on the board.
+		// TODO -- input handling - rotate, shift left/right - be sure to test against pieces on board/edges
 		
 		if (FrameCount <= kWaitFramesBeforeDropping)
 		{
@@ -30,19 +29,21 @@ public class Drop : MonoBehaviour {
 		}
 		else
 		{
+			MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
+			
 			FrameCount = 0;
 			float tempY = transform.position.y;
 			
 			// TODO -- test for intersection with other, loose tiles.
+			//         use mlScript!
 			if (tempY > BottomYValue)
 			{
 				transform.Translate(0, yStep, 0);
 			}
 			else
 			{
-				Component[] tileXForms;
-			
-				tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
+				Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
+				
 				foreach (Transform t in tileXForms)
 				{
 					if (t.gameObject != this.gameObject)
@@ -51,8 +52,10 @@ public class Drop : MonoBehaviour {
 						newLoc = newLoc + t.localPosition;
 						Transform tileInstance = Instantiate(IndividualTile, newLoc, Quaternion.identity) as Transform;
 						tileInstance.gameObject.transform.parent = TileContainer.gameObject.transform;
+						//mlScript.DoIt();	//TODO -- add info to positioning grid.
 					}
 				}
+				
 		
 				Destroy(this.gameObject);
 			}
