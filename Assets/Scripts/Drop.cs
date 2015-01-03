@@ -36,7 +36,9 @@ public class Drop : MonoBehaviour {
 			
 			// TODO -- test for intersection with other, loose tiles.
 			//         use mlScript!
-			if (tempY > BottomYValue)
+			bool canMoveDown = tempY > BottomYValue;	// TODO -- push to helper function.
+			
+			if (canMoveDown)
 			{
 				transform.Translate(0, yStep, 0);
 			}

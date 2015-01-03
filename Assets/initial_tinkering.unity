@@ -2862,8 +2862,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2923f7edd6ae2754fb80532c7707d08b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BoardHeight: 20
-  BoardWidth: 10
+  BoardHeight: 21
+  BoardWidth: 12
   Piece_BackL: {fileID: 404262, guid: 59a71ad3603616c4da2994e443c879d0, type: 2}
   Piece_L: {fileID: 430056, guid: c26a4c764bc336b468343224892a39d5, type: 2}
   Piece_Long: {fileID: 425966, guid: 02c17644d1e34e842bf8575568fea822, type: 2}

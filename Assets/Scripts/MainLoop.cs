@@ -3,8 +3,8 @@ using System.Collections;
 
 public class MainLoop : MonoBehaviour
 {
-	public int BoardHeight;
-	public int BoardWidth;
+	public int BoardHeight = 21;
+	public int BoardWidth = 12;
 	
 	// TODO -- create grid of piece locations... so's we can test for complete rows, etc.
 	
@@ -19,15 +19,52 @@ public class MainLoop : MonoBehaviour
 	public Transform StartLocation;
 	public Transform TileContainer;
 	
-	
+	bool[][] mBoard;
+		
 	
 	// Use this for initialization
 	void Start ()
 	{
+		mBoard = new bool[BoardHeight][BoardWidth];
+		
+		foreach (bool b in mBoard[0])	// Bottom row is all board
+		{
+			b = true;
+		}
+		
+		for (int i = 1; i < BoardHeight; i++)
+		{
+			mBoard[i][0] = true;
+			for (int j = 1; j < (BoardWidth - 1); j++)
+			{
+				mBoard[i][j] = false;
+			}
+			mBoard[i][BoardWidth - 1] = true;
+		}
+		
 		// TOOD -- load board edges and main area 
 	
 	}
 	
+	public void TranslateCoordtoGridCell(float x, float y, out int gridX, out int gridY)
+	{
+		// TODO
+		
+		gridX = 0;
+		gridY = 0;
+	}
+	
+	public bool GridCellOccupied(int gridX, int gridY)
+	{
+		if ((gridY >= 0) && (gridY < BoardHeight))
+		{
+			return mBoard[gridY][gridX];
+		}
+		else
+		{
+			return false;	// Grid isn't there, so... no, not occupied.
+		}
+	}
 	
 	void Create_BackL()
 	{
