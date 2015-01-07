@@ -6,7 +6,8 @@ public class MainLoop : MonoBehaviour
 	public int BoardHeight = 21;
 	public int BoardWidth = 12;
 	
-	// TODO -- create grid of piece locations... so's we can test for complete rows, etc.
+	bool[,] mBoard;
+	
 	
 	public Transform Piece_BackL;
 	public Transform Piece_L;
@@ -19,30 +20,29 @@ public class MainLoop : MonoBehaviour
 	public Transform StartLocation;
 	public Transform TileContainer;
 	
-	bool[][] mBoard;
 		
 	
 	// Use this for initialization
 	void Start ()
 	{
-		mBoard = new bool[BoardHeight][BoardWidth];
+		mBoard = new bool[BoardHeight, BoardWidth];
 		
-		foreach (bool b in mBoard[0])	// Bottom row is all board
+		for (int i = 0; i < BoardWidth; i++) // Bottom row is all border
 		{
-			b = true;
+			mBoard[0, i] = true;
 		}
 		
 		for (int i = 1; i < BoardHeight; i++)
 		{
-			mBoard[i][0] = true;
+			mBoard[i, 0] = true;
 			for (int j = 1; j < (BoardWidth - 1); j++)
 			{
-				mBoard[i][j] = false;
+				mBoard[i, j] = false;
 			}
-			mBoard[i][BoardWidth - 1] = true;
+			mBoard[i, BoardWidth - 1] = true;
 		}
 		
-		// TOOD -- load board edges and main area 
+		// TODO -- load board edges and main area 
 	
 	}
 	
@@ -58,7 +58,7 @@ public class MainLoop : MonoBehaviour
 	{
 		if ((gridY >= 0) && (gridY < BoardHeight))
 		{
-			return mBoard[gridY][gridX];
+			return mBoard[gridY, gridX];
 		}
 		else
 		{
