@@ -88,7 +88,7 @@ public class MainLoop : MonoBehaviour
 	
 	public void OccupyGridCell(int gridX, int gridY)
 	{
-		mBoard[gridX, gridY] = true;
+		mBoard[gridY, gridX] = true;
 	}
 	
 	void Create_BackL()
