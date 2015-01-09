@@ -18,6 +18,29 @@ public class Drop : MonoBehaviour {
 		FrameCount = 0;
 	}
 	
+	bool AllSpotsOpen(Vector3 offset)
+	{
+		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
+		MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
+		
+		foreach (Transform t in tileXForms)
+		{
+			if (t.gameObject != this.gameObject)
+			{
+				Vector3 newLoc = transform.position + t.localPosition + offset;
+				int gridX = 0;
+				int gridY = 0;
+				mlScript.TranslateCoordtoGridCell(newLoc.x, newLoc.y, out gridX, out gridY);
+				if (mlScript.GridCellOccupied(gridX, gridY))
+				{
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
 	// Update is called once per frame
 	void Update()
 	{
@@ -29,32 +52,34 @@ public class Drop : MonoBehaviour {
 		}
 		else
 		{
-			MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
-			
 			FrameCount = 0;
-			float tempY = transform.position.y;
+			Vector3 moveDown = new Vector3(0, yStep, 0);
 			
 			// TODO -- test for intersection with other, loose tiles.
 			//         use mlScript!
-			bool canMoveDown = tempY > BottomYValue;	// TODO -- push to helper function.
+			bool canMoveDown = AllSpotsOpen(moveDown);
 			
 			if (canMoveDown)
 			{
-				transform.Translate(0, yStep, 0);
+				transform.Translate(moveDown);
 			}
 			else
 			{
 				Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
+				MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
 				
 				foreach (Transform t in tileXForms)
 				{
 					if (t.gameObject != this.gameObject)
 					{
-						Vector3 newLoc = transform.position;
-						newLoc = newLoc + t.localPosition;
+						Vector3 newLoc = transform.position + t.localPosition;
 						Transform tileInstance = Instantiate(IndividualTile, newLoc, Quaternion.identity) as Transform;
 						tileInstance.gameObject.transform.parent = TileContainer.gameObject.transform;
-						//mlScript.DoIt();	//TODO -- add info to positioning grid.
+						
+						int gridX = 0;
+						int gridY = 0;
+						mlScript.TranslateCoordtoGridCell(newLoc.x, newLoc.y, out gridX, out gridY);
+						mlScript.OccupyGridCell(gridX, gridY);
 					}
 				}
 				

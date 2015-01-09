@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
 public class MainLoop : MonoBehaviour
 {
 	public int BoardHeight = 21;
@@ -17,41 +18,60 @@ public class MainLoop : MonoBehaviour
 	public Transform Piece_T;
 	public Transform Piece_Z;
 	
+	public Transform BorderRow;
+	public Transform BorderedEdgesRow;
+	
 	public Transform StartLocation;
 	public Transform TileContainer;
+	public Transform Background;
 	
 		
 	
-	// Use this for initialization
 	void Start ()
 	{
+		// Init board with a 1-tile boarder on sides and bottom, top is open, all other slots open
 		mBoard = new bool[BoardHeight, BoardWidth];
 		
-		for (int i = 0; i < BoardWidth; i++) // Bottom row is all border
-		{
-			mBoard[0, i] = true;
-		}
+		Vector3 loc = Background.position;
+		
+		CreateBorderRow(loc, 0);
 		
 		for (int i = 1; i < BoardHeight; i++)
 		{
-			mBoard[i, 0] = true;
-			for (int j = 1; j < (BoardWidth - 1); j++)
-			{
-				mBoard[i, j] = false;
-			}
-			mBoard[i, BoardWidth - 1] = true;
+			loc.y += 1;
+			CreateBorderedEdgesRow(loc, i);
 		}
+	}
 		
-		// TODO -- load board edges and main area 
+	void CreateBorderRow(Vector3 loc, int rowNumber)
+	{
+		Transform borderRow = Instantiate(BorderRow, loc, Quaternion.identity) as Transform;		
+		borderRow.gameObject.transform.parent = Background.gameObject.transform;
+		
+		for (int i = 0; i < BoardWidth; i++) // Bottom row is all border
+		{
+			mBoard[rowNumber, i] = true;
+		}
+	}
 	
+	void CreateBorderedEdgesRow(Vector3 loc, int rowNum)
+	{
+		Transform borderedEdgesRow = Instantiate(BorderedEdgesRow, loc, Quaternion.identity) as Transform;		
+		borderedEdgesRow.gameObject.transform.parent = Background.gameObject.transform;
+		
+		mBoard[rowNum, 0] = true;
+		for (int j = 1; j < (BoardWidth - 1); j++)
+		{
+			mBoard[rowNum, j] = false;
+		}
+		mBoard[rowNum, BoardWidth - 1] = true;
 	}
 	
 	public void TranslateCoordtoGridCell(float x, float y, out int gridX, out int gridY)
 	{
-		// TODO
 		
-		gridX = 0;
-		gridY = 0;
+		gridX = Mathf.FloorToInt(x - Background.position.x);
+		gridY = Mathf.FloorToInt(y - Background.position.y);
 	}
 	
 	public bool GridCellOccupied(int gridX, int gridY)
@@ -64,6 +84,11 @@ public class MainLoop : MonoBehaviour
 		{
 			return false;	// Grid isn't there, so... no, not occupied.
 		}
+	}
+	
+	public void OccupyGridCell(int gridX, int gridY)
+	{
+		mBoard[gridX, gridY] = true;
 	}
 	
 	void Create_BackL()
@@ -120,17 +145,6 @@ public class MainLoop : MonoBehaviour
 		Drop dropScript = newPiece.gameObject.GetComponent<Drop>(); 
 		dropScript.TileContainer = TileContainer;
 		dropScript.MainLoopScriptObject = this.gameObject;
-	}
-	
-	//  TODO -- turn this into a function to register individual pieces on the grid.
-	public void DoIt()
-	{
-		Create_Z();
-	}
-	
-	public bool SquareOpen()	// TODO -- test if a given location is available
-	{
-		return true;	// TODO!
 	}
 		
 	void CheckForCompleteLines()
