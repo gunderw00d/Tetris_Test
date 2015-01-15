@@ -9,14 +9,10 @@ public class MainLoop : MonoBehaviour
 	
 	bool[,] mBoard;
 	
+	public Transform[] PiecePrefabs = new Transform[7];
+	public int[] LevelDropFrames = new int[10];
 	
-	public Transform Piece_BackL;
-	public Transform Piece_L;
-	public Transform Piece_Long;
-	public Transform Piece_S;
-	public Transform Piece_Sqaure;
-	public Transform Piece_T;
-	public Transform Piece_Z;
+	Transform CurrentFallingPiece = null;
 	
 	public Transform BorderRow;
 	public Transform BorderedEdgesRow;
@@ -25,8 +21,8 @@ public class MainLoop : MonoBehaviour
 	public Transform TileContainer;
 	public Transform Background;
 	
-		
-	
+	public int CurrentLevel = 0;
+
 	void Start ()
 	{
 		// Init board with a 1-tile boarder on sides and bottom, top is open, all other slots open
@@ -36,10 +32,10 @@ public class MainLoop : MonoBehaviour
 		
 		CreateBorderRow(loc, 0);
 		
-		for (int i = 1; i < BoardHeight; i++)
+		for (int row = 1; row < BoardHeight; row++)
 		{
 			loc.y += 1;
-			CreateBorderedEdgesRow(loc, i);
+			CreateBorderedEdgesRow(loc, row);
 		}
 	}
 		
@@ -48,9 +44,9 @@ public class MainLoop : MonoBehaviour
 		Transform borderRow = Instantiate(BorderRow, loc, Quaternion.identity) as Transform;		
 		borderRow.gameObject.transform.parent = Background.gameObject.transform;
 		
-		for (int i = 0; i < BoardWidth; i++) // Bottom row is all border
+		for (int column = 0; column < BoardWidth; column++) // Bottom row is all border
 		{
-			mBoard[rowNumber, i] = true;
+			mBoard[rowNumber, column] = true;
 		}
 	}
 	
@@ -60,25 +56,29 @@ public class MainLoop : MonoBehaviour
 		borderedEdgesRow.gameObject.transform.parent = Background.gameObject.transform;
 		
 		mBoard[rowNum, 0] = true;
-		for (int j = 1; j < (BoardWidth - 1); j++)
+		for (int column = 1; column < (BoardWidth - 1); column++)
 		{
-			mBoard[rowNum, j] = false;
+			mBoard[rowNum, column] = false;
 		}
 		mBoard[rowNum, BoardWidth - 1] = true;
 	}
 	
-	public void TranslateCoordtoGridCell(float x, float y, out int gridX, out int gridY)
+	public void TranslateCoordtoGridCell(float x, float y, out int gridColumn, out int gridRow)
 	{
-		
-		gridX = Mathf.FloorToInt(x - Background.position.x);
-		gridY = Mathf.FloorToInt(y - Background.position.y);
+		gridColumn = Mathf.FloorToInt(x - Background.position.x);
+		gridRow = Mathf.FloorToInt(y - Background.position.y);
 	}
 	
-	public bool GridCellOccupied(int gridX, int gridY)
+	bool InGridRange(int gridColumn, int gridRow)
 	{
-		if ((gridY >= 0) && (gridY < BoardHeight))
+		return (gridRow >= 0) && (gridRow < BoardHeight) && (gridColumn >= 0) && (gridColumn < BoardWidth);
+	}
+	
+	public bool GridCellOccupied(int gridColumn, int gridRow)
+	{
+		if (InGridRange(gridColumn, gridRow))
 		{
-			return mBoard[gridY, gridX];
+			return mBoard[gridRow, gridColumn];
 		}
 		else
 		{
@@ -86,69 +86,39 @@ public class MainLoop : MonoBehaviour
 		}
 	}
 	
-	public void OccupyGridCell(int gridX, int gridY)
+	public void OccupyGridCell(int gridColumn, int gridRow)
 	{
-		mBoard[gridY, gridX] = true;
+		if (InGridRange(gridColumn, gridRow))
+		{
+			mBoard[gridRow, gridColumn] = true;
+		}
 	}
-	
-	void Create_BackL()
-	{
-		Transform newPiece = Instantiate(Piece_BackL, StartLocation.transform.position, Quaternion.identity) as Transform;
-		Drop dropScript = newPiece.gameObject.GetComponent<Drop>(); 
-		dropScript.TileContainer = TileContainer;
-		dropScript.MainLoopScriptObject = this.gameObject;
-	}
-	
-	void Create_L()
-	{
-		Transform newPiece = Instantiate(Piece_L, StartLocation.transform.position, Quaternion.identity) as Transform;
-		Drop dropScript = newPiece.gameObject.GetComponent<Drop>(); 
-		dropScript.TileContainer = TileContainer;
-		dropScript.MainLoopScriptObject = this.gameObject;
-	}
-	
-	void Create_Long()
-	{
-		Transform newPiece = Instantiate(Piece_Long, StartLocation.transform.position, Quaternion.identity) as Transform;
-		Drop dropScript = newPiece.gameObject.GetComponent<Drop>(); 
-		dropScript.TileContainer = TileContainer;
-		dropScript.MainLoopScriptObject = this.gameObject;
-	}
-	
-	void Create_S()
-	{
-		Transform newPiece = Instantiate(Piece_S, StartLocation.transform.position, Quaternion.identity) as Transform;
-		Drop dropScript = newPiece.gameObject.GetComponent<Drop>(); 
-		dropScript.TileContainer = TileContainer;
-		dropScript.MainLoopScriptObject = this.gameObject;
-	}
-	
-	void Create_Square()
-	{
-		Transform newPiece = Instantiate(Piece_Sqaure, StartLocation.transform.position, Quaternion.identity) as Transform;
-		Drop dropScript = newPiece.gameObject.GetComponent<Drop>(); 
-		dropScript.TileContainer = TileContainer;
-		dropScript.MainLoopScriptObject = this.gameObject;
-	}
-	
-	void Create_T()
-	{
-		Transform newPiece = Instantiate(Piece_T, StartLocation.transform.position, Quaternion.identity) as Transform;
-		Drop dropScript = newPiece.gameObject.GetComponent<Drop>(); 
-		dropScript.TileContainer = TileContainer;
-		dropScript.MainLoopScriptObject = this.gameObject;
-	}
-	
-	void Create_Z()
-	{
-		Transform newPiece = Instantiate(Piece_Z, StartLocation.transform.position, Quaternion.identity) as Transform;
-		Drop dropScript = newPiece.gameObject.GetComponent<Drop>(); 
-		dropScript.TileContainer = TileContainer;
-		dropScript.MainLoopScriptObject = this.gameObject;
-	}
-		
+			
 	void CheckForCompleteLines()
 	{
+		// TODO -- remove complete lines, increment completed line count, check for level up.
+	}
+	
+	void CreatePiece(int dropOnFrame, Transform piecePrefab)
+	{
+		CurrentFallingPiece = Instantiate(piecePrefab, StartLocation.transform.position, Quaternion.identity) as Transform;
+		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>(); 
+		dropScript.TileContainer = TileContainer;
+		dropScript.MainLoopScriptObject = this.gameObject;
+		dropScript.DropOnFrame = dropOnFrame;
+	}
+	
+	public void DestroyCurrentPiece()
+	{
+		Destroy(CurrentFallingPiece.gameObject);
+		CurrentFallingPiece = null;
+	}
+	
+	void CreateRandomPiece(int dropOnFrame)
+	{
+		// TODO -- randomize piece selection
+		
+		CreatePiece(dropOnFrame, PiecePrefabs[0]);
 	}
 	
 	// Update is called once per frame
@@ -159,12 +129,13 @@ public class MainLoop : MonoBehaviour
 		//  TODO -- preview next piece to drop while waiting.
 		
 		
+		// TODO -- input handler!
 		// PLACEHOLDER/TEST STUFF!
-		bool createPiece = Input.GetKeyUp("space");
+		bool createPiece = Input.GetKeyUp("space") && (CurrentFallingPiece == null);
 		
 		if (createPiece)
 		{
-			Create_BackL();
+			CreateRandomPiece(LevelDropFrames[CurrentLevel]);
 		}
 		
 		CheckForCompleteLines();

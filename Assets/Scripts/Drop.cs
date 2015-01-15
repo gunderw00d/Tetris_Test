@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Drop : MonoBehaviour {
 
-	public int kWaitFramesBeforeDropping = 10;
+	public int DropOnFrame = 10;
 	public int FrameCount = 0;
 	public float yStep = -1;
 	public float BottomYValue = 2;
@@ -46,7 +46,7 @@ public class Drop : MonoBehaviour {
 	{
 		// TODO -- input handling - rotate, shift left/right - be sure to test against pieces on board/edges
 		
-		if (FrameCount <= kWaitFramesBeforeDropping)
+		if (FrameCount <= DropOnFrame)
 		{
 			FrameCount += 1;
 		}
@@ -76,15 +76,15 @@ public class Drop : MonoBehaviour {
 						Transform tileInstance = Instantiate(IndividualTile, newLoc, Quaternion.identity) as Transform;
 						tileInstance.gameObject.transform.parent = TileContainer.gameObject.transform;
 						
-						int gridX = 0;
-						int gridY = 0;
-						mlScript.TranslateCoordtoGridCell(newLoc.x, newLoc.y, out gridX, out gridY);
-						mlScript.OccupyGridCell(gridX, gridY);
+						int gridColumn = 0;
+						int gridRow = 0;
+						mlScript.TranslateCoordtoGridCell(newLoc.x, newLoc.y, out gridColumn, out gridRow);
+						mlScript.OccupyGridCell(gridColumn, gridRow);
 					}
 				}
 				
 		
-				Destroy(this.gameObject);
+				mlScript.DestroyCurrentPiece();
 			}
 		}
 	}

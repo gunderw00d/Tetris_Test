@@ -180,18 +180,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BoardHeight: 21
   BoardWidth: 12
-  Piece_BackL: {fileID: 404262, guid: 59a71ad3603616c4da2994e443c879d0, type: 2}
-  Piece_L: {fileID: 430056, guid: c26a4c764bc336b468343224892a39d5, type: 2}
-  Piece_Long: {fileID: 425966, guid: 02c17644d1e34e842bf8575568fea822, type: 2}
-  Piece_S: {fileID: 486850, guid: 30f1e5a4edf264146b6000e4d06877c0, type: 2}
-  Piece_Sqaure: {fileID: 431506, guid: a9ce673fb3ca54d45ae37af2bffa9acb, type: 2}
-  Piece_T: {fileID: 484300, guid: f6ae4b28c81b3404483dcd712e37e7b7, type: 2}
-  Piece_Z: {fileID: 480474, guid: 5df1fc938a3393b4b8370567efdf9af9, type: 2}
+  PiecePrefabs:
+  - {fileID: 404262, guid: 59a71ad3603616c4da2994e443c879d0, type: 2}
+  - {fileID: 430056, guid: c26a4c764bc336b468343224892a39d5, type: 2}
+  - {fileID: 425966, guid: 02c17644d1e34e842bf8575568fea822, type: 2}
+  - {fileID: 486850, guid: 30f1e5a4edf264146b6000e4d06877c0, type: 2}
+  - {fileID: 431506, guid: a9ce673fb3ca54d45ae37af2bffa9acb, type: 2}
+  - {fileID: 484300, guid: f6ae4b28c81b3404483dcd712e37e7b7, type: 2}
+  - {fileID: 480474, guid: 5df1fc938a3393b4b8370567efdf9af9, type: 2}
+  LevelDropFrames: 2d00000028000000230000001e00000019000000140000000f0000000a0000000500000000000000
   BorderRow: {fileID: 493292, guid: e50f3c350134ef24281140e3833089d1, type: 2}
   BorderedEdgesRow: {fileID: 460986, guid: 6e599fcf348e9974a80d94e63cbda699, type: 2}
   StartLocation: {fileID: 345175963}
   TileContainer: {fileID: 263889790}
   Background: {fileID: 1538561059}
+  CurrentLevel: 0
 --- !u!4 &451203006
 Transform:
   m_ObjectHideFlags: 0
