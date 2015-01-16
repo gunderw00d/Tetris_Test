@@ -24,12 +24,10 @@ public class MainLoop : MonoBehaviour
 	
 	public int CurrentLevel = 0;
 
-	InputHandler InputHandlerScript;
 	
-	public delegate void InputAction(int val);
+	public delegate void InputAction();
 	
-	Dictionary<InputHandler.InputType, InputAction> InputMap;
-	Dictionary<InputHandler.InputType, int> InputActionData;
+	Dictionary<KeyCode, InputAction> InputMap;
 	
 	#endregion // vars
 
@@ -50,37 +48,10 @@ public class MainLoop : MonoBehaviour
 		}
 		
 		InitInputHandling();
+		
+		Random.seed = (int)System.DateTime.Now.Ticks;
 	}
 	
-	void InitInputHandling()
-	{
-		InputHandlerScript = gameObject.GetComponent<InputHandler>();
-		
-		InputMap = new Dictionary<InputHandler.InputType, InputAction>();
-		InputActionData = new Dictionary<InputHandler.InputType, int>();
-		
-		InputMap[InputHandler.InputType.Space_Up] = CreateRandomPiece;
-		InputMap[InputHandler.InputType.None] = DoNothing;
-		
-		UpdateInputData();
-	}
-	
-	void PieceFallingInput()
-	{
-		InputMap[InputHandler.InputType.Space_Up] = DoNothing;
-	}
-	
-	void NoPieceFallingInput()
-	{
-		InputMap[InputHandler.InputType.Space_Up] = CreateRandomPiece;
-	}
-	
-	void UpdateInputData()
-	{
-		InputActionData[InputHandler.InputType.Space_Up] = LevelDropFrames[CurrentLevel];
-		InputActionData[InputHandler.InputType.None] = 0;
-	}
-		
 	void CreateBorderRow(Vector3 loc, int rowNumber)
 	{
 		Transform borderRow = Instantiate(BorderRow, loc, Quaternion.identity) as Transform;		
@@ -143,8 +114,6 @@ public class MainLoop : MonoBehaviour
 	void CheckForCompleteLines()
 	{
 		// TODO -- remove complete lines, increment completed line count, check for level up.
-		
-		UpdateInputData();
 	}
 	
 	void CreatePiece(int dropOnFrame, Transform piecePrefab)
@@ -165,23 +134,116 @@ public class MainLoop : MonoBehaviour
 		NoPieceFallingInput();
 	}
 	
-	void CreateRandomPiece(int dropOnFrame)
+	void CreateRandomPiece()
 	{
 		int pieceIndex = Random.Range(0, PiecePrefabs.Length);
 		
-		CreatePiece(dropOnFrame, PiecePrefabs[pieceIndex]);
+		CreatePiece(LevelDropFrames[CurrentLevel], PiecePrefabs[pieceIndex]);
 	}
 	#endregion // piece management
 	
-	void DoNothing(int ignore)
+	#region input
+		
+	void InitInputHandling()
 	{
+		InputMap = new Dictionary<KeyCode, InputAction>();
+		
+		NoPieceFallingInput();
+		InputMap[KeyCode.None] = DoNothing;
+	}
+	
+	void PieceFallingInput()
+	{
+		InputMap[KeyCode.Space] = MovePieceDown;
+		InputMap[KeyCode.LeftArrow] = MovePieceLeft;
+		InputMap[KeyCode.RightArrow] = MovePieceRight;
+		InputMap[KeyCode.UpArrow] = RotatePieceCW;
+		InputMap[KeyCode.DownArrow] = RotatePieceCCW;
+	}
+	
+	void NoPieceFallingInput()
+	{
+		InputMap[KeyCode.Space] = CreateRandomPiece;	// TODO -- DoNothing
+		InputMap[KeyCode.LeftArrow] = DoNothing;
+		InputMap[KeyCode.RightArrow] = DoNothing;
+		InputMap[KeyCode.UpArrow] = DoNothing;
+		InputMap[KeyCode.DownArrow] = DoNothing;
+	}
+	
+	public KeyCode CheckForInput()
+	{
+		// TODO -- lots more in here.  Simple dev test.
+		// TODO -- is there really no better way to do this?  Can I not just get keyboard events directly?
+		if (Input.GetKey(KeyCode.Space))
+		{
+			return KeyCode.Space;
+		}
+		else if (Input.GetKey(KeyCode.LeftArrow))
+		{
+			return KeyCode.LeftArrow;
+		}
+		else if (Input.GetKey(KeyCode.RightArrow))
+		{
+			return KeyCode.RightArrow;
+		}
+		else if (Input.GetKey(KeyCode.UpArrow))
+		{
+			return KeyCode.UpArrow;
+		}
+		else if (Input.GetKey(KeyCode.DownArrow))
+		{
+			return KeyCode.DownArrow;
+		}
+		else
+		{
+			return KeyCode.None;
+		}
 	}
 	
 	void HandleInput()
 	{
-		InputHandler.InputType inputType = InputHandlerScript.CheckForInput();
-		InputMap[inputType](InputActionData[inputType]);
+		KeyCode inputType = CheckForInput();
+		if (InputMap.ContainsKey(inputType))
+		{
+			InputMap[inputType]();
+		}
 	}
+	
+	void DoNothing()
+	{
+	}
+	
+	void MovePieceLeft()
+	{		
+		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+		dropScript.MovePieceLeft();
+	}
+	
+	void MovePieceRight()
+	{
+		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+		dropScript.MovePieceRight();
+	}
+	
+	void RotatePieceCW()
+	{
+		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+		dropScript.RotatePieceCW();
+	}
+	
+	void RotatePieceCCW()
+	{
+		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+		dropScript.RotatePieceCCW();
+	}
+	
+	void MovePieceDown()
+	{
+		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+		dropScript.MovePieceDown();
+	}
+	
+	#endregion // input
 	
 	// Update is called once per frame
 	void Update ()

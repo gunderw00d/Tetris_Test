@@ -43,6 +43,80 @@ public class Drop : MonoBehaviour
 		return true;
 	}
 	
+	void DecomposePiece()
+	{
+		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
+		MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
+		
+		foreach (Transform t in tileXForms)
+		{
+			if (t.gameObject != this.gameObject)
+			{
+				Vector3 newLoc = transform.position + t.localPosition;
+				Transform tileInstance = Instantiate(IndividualTile, newLoc, Quaternion.identity) as Transform;
+				tileInstance.gameObject.transform.parent = TileContainer.gameObject.transform;
+				
+				int gridColumn = 0;
+				int gridRow = 0;
+				mlScript.TranslateCoordtoGridCell(newLoc.x, newLoc.y, out gridColumn, out gridRow);
+				mlScript.OccupyGridCell(gridColumn, gridRow);
+			}
+		}
+		
+		
+		mlScript.DestroyCurrentPiece();
+	}
+	
+	public void MovePieceDown()
+	{
+		Vector3 moveDown = new Vector3(0, yStep, 0);
+		
+		bool canMoveDown = AllSpotsOpen(moveDown);
+		
+		if (canMoveDown)
+		{
+			transform.Translate(moveDown);
+		}
+		else
+		{
+			DecomposePiece();
+		}
+	}
+	
+	public void MovePieceLeft()
+	{
+		Vector3 moveLeft = new Vector3(-1, 0, 0);
+		
+		bool canMoveLeft = AllSpotsOpen(moveLeft);
+		
+		if (canMoveLeft)
+		{
+			transform.Translate(moveLeft);
+		}
+	}
+	
+	public void MovePieceRight()
+	{
+		Vector3 moveRight = new Vector3(1, 0, 0);
+		
+		bool canMoveRight = AllSpotsOpen(moveRight);
+		
+		if (canMoveRight)
+		{
+			transform.Translate(moveRight);
+		}
+	}
+	
+	public void RotatePieceCW()
+	{
+		// TODO
+	}
+	
+	public void RotatePieceCCW()
+	{
+		// TODO
+	}
+	
 	// Update is called once per frame
 	void Update()
 	{
@@ -55,39 +129,7 @@ public class Drop : MonoBehaviour
 		else
 		{
 			FrameCount = 0;
-			Vector3 moveDown = new Vector3(0, yStep, 0);
-			
-			// TODO -- test for intersection with other, loose tiles.
-			//         use mlScript!
-			bool canMoveDown = AllSpotsOpen(moveDown);
-			
-			if (canMoveDown)
-			{
-				transform.Translate(moveDown);
-			}
-			else
-			{
-				Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
-				MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
-				
-				foreach (Transform t in tileXForms)
-				{
-					if (t.gameObject != this.gameObject)
-					{
-						Vector3 newLoc = transform.position + t.localPosition;
-						Transform tileInstance = Instantiate(IndividualTile, newLoc, Quaternion.identity) as Transform;
-						tileInstance.gameObject.transform.parent = TileContainer.gameObject.transform;
-						
-						int gridColumn = 0;
-						int gridRow = 0;
-						mlScript.TranslateCoordtoGridCell(newLoc.x, newLoc.y, out gridColumn, out gridRow);
-						mlScript.OccupyGridCell(gridColumn, gridRow);
-					}
-				}
-				
-		
-				mlScript.DestroyCurrentPiece();
-			}
+			MovePieceDown();
 		}
 	}
 }
