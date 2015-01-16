@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using System.Collections.Generic;
 
 public class MainLoop : MonoBehaviour
 {
+	#region vars
 	public int BoardHeight = 21;
 	public int BoardWidth = 12;
 	
@@ -23,6 +24,16 @@ public class MainLoop : MonoBehaviour
 	
 	public int CurrentLevel = 0;
 
+	InputHandler InputHandlerScript;
+	
+	public delegate void InputAction(int val);
+	
+	Dictionary<InputHandler.InputType, InputAction> InputMap;
+	Dictionary<InputHandler.InputType, int> InputActionData;
+	
+	#endregion // vars
+
+	#region init
 	void Start ()
 	{
 		// Init board with a 1-tile boarder on sides and bottom, top is open, all other slots open
@@ -37,6 +48,37 @@ public class MainLoop : MonoBehaviour
 			loc.y += 1;
 			CreateBorderedEdgesRow(loc, row);
 		}
+		
+		InitInputHandling();
+	}
+	
+	void InitInputHandling()
+	{
+		InputHandlerScript = gameObject.GetComponent<InputHandler>();
+		
+		InputMap = new Dictionary<InputHandler.InputType, InputAction>();
+		InputActionData = new Dictionary<InputHandler.InputType, int>();
+		
+		InputMap[InputHandler.InputType.Space_Up] = CreateRandomPiece;
+		InputMap[InputHandler.InputType.None] = DoNothing;
+		
+		UpdateInputData();
+	}
+	
+	void PieceFallingInput()
+	{
+		InputMap[InputHandler.InputType.Space_Up] = DoNothing;
+	}
+	
+	void NoPieceFallingInput()
+	{
+		InputMap[InputHandler.InputType.Space_Up] = CreateRandomPiece;
+	}
+	
+	void UpdateInputData()
+	{
+		InputActionData[InputHandler.InputType.Space_Up] = LevelDropFrames[CurrentLevel];
+		InputActionData[InputHandler.InputType.None] = 0;
 	}
 		
 	void CreateBorderRow(Vector3 loc, int rowNumber)
@@ -62,7 +104,9 @@ public class MainLoop : MonoBehaviour
 		}
 		mBoard[rowNum, BoardWidth - 1] = true;
 	}
+	#endregion // init
 	
+	#region grid utility
 	public void TranslateCoordtoGridCell(float x, float y, out int gridColumn, out int gridRow)
 	{
 		gridColumn = Mathf.FloorToInt(x - Background.position.x);
@@ -93,10 +137,14 @@ public class MainLoop : MonoBehaviour
 			mBoard[gridRow, gridColumn] = true;
 		}
 	}
-			
+	#endregion // grid utility
+
+	#region piece management
 	void CheckForCompleteLines()
 	{
 		// TODO -- remove complete lines, increment completed line count, check for level up.
+		
+		UpdateInputData();
 	}
 	
 	void CreatePiece(int dropOnFrame, Transform piecePrefab)
@@ -106,19 +154,33 @@ public class MainLoop : MonoBehaviour
 		dropScript.TileContainer = TileContainer;
 		dropScript.MainLoopScriptObject = this.gameObject;
 		dropScript.DropOnFrame = dropOnFrame;
+		
+		PieceFallingInput();
 	}
 	
 	public void DestroyCurrentPiece()
 	{
 		Destroy(CurrentFallingPiece.gameObject);
 		CurrentFallingPiece = null;
+		NoPieceFallingInput();
 	}
 	
 	void CreateRandomPiece(int dropOnFrame)
 	{
-		// TODO -- randomize piece selection
+		int pieceIndex = Random.Range(0, PiecePrefabs.Length);
 		
-		CreatePiece(dropOnFrame, PiecePrefabs[0]);
+		CreatePiece(dropOnFrame, PiecePrefabs[pieceIndex]);
+	}
+	#endregion // piece management
+	
+	void DoNothing(int ignore)
+	{
+	}
+	
+	void HandleInput()
+	{
+		InputHandler.InputType inputType = InputHandlerScript.CheckForInput();
+		InputMap[inputType](InputActionData[inputType]);
 	}
 	
 	// Update is called once per frame
@@ -128,18 +190,8 @@ public class MainLoop : MonoBehaviour
 		//         handle game pause -- or not?  Maybe something else just pauses this and the Drop script?
 		//  TODO -- preview next piece to drop while waiting.
 		
-		
-		// TODO -- input handler!
-		// PLACEHOLDER/TEST STUFF!
-		bool createPiece = Input.GetKeyUp("space") && (CurrentFallingPiece == null);
-		
-		if (createPiece)
-		{
-			CreateRandomPiece(LevelDropFrames[CurrentLevel]);
-		}
+		HandleInput();
 		
 		CheckForCompleteLines();
-		
-		// TODO -- level up - speed up drop rate
 	}
 }

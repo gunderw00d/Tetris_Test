@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Drop : MonoBehaviour {
-
+public class Drop : MonoBehaviour
+{
+	#region vars
 	public int DropOnFrame = 10;
 	public int FrameCount = 0;
 	public float yStep = -1;
@@ -11,6 +12,7 @@ public class Drop : MonoBehaviour {
 	public Transform TileContainer;
 	
 	public GameObject MainLoopScriptObject;
+	#endregion // vars
 	
 	// Use this for initialization
 	void Start()
