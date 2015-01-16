@@ -25,9 +25,8 @@ public class MainLoop : MonoBehaviour
 	public int CurrentLevel = 0;
 
 	
-	public delegate void InputAction();
-	
-	Dictionary<KeyCode, InputAction> InputMap;
+	public delegate void dInputAction();
+	InputHandler InputHandlerScript;
 	
 	#endregion // vars
 
@@ -47,9 +46,9 @@ public class MainLoop : MonoBehaviour
 			CreateBorderedEdgesRow(loc, row);
 		}
 		
-		InitInputHandling();
-		
 		Random.seed = (int)System.DateTime.Now.Ticks;
+		
+		InputHandlerScript = gameObject.GetComponent<InputHandler>();
 	}
 	
 	void CreateBorderRow(Vector3 loc, int rowNumber)
@@ -124,17 +123,18 @@ public class MainLoop : MonoBehaviour
 		dropScript.MainLoopScriptObject = this.gameObject;
 		dropScript.DropOnFrame = dropOnFrame;
 		
-		PieceFallingInput();
+		InputHandlerScript.PieceFallingInput();
 	}
 	
 	public void DestroyCurrentPiece()
 	{
 		Destroy(CurrentFallingPiece.gameObject);
 		CurrentFallingPiece = null;
-		NoPieceFallingInput();
+		InputHandlerScript.NoPieceFallingInput();
 	}
 	
-	void CreateRandomPiece()
+	// TODO -- temp public - remove after dev
+	public void CreateRandomPiece()
 	{
 		int pieceIndex = Random.Range(0, PiecePrefabs.Length);
 		
@@ -144,100 +144,35 @@ public class MainLoop : MonoBehaviour
 	
 	#region input
 		
-	void InitInputHandling()
-	{
-		InputMap = new Dictionary<KeyCode, InputAction>();
-		
-		NoPieceFallingInput();
-		InputMap[KeyCode.None] = DoNothing;
-	}
-	
-	void PieceFallingInput()
-	{
-		InputMap[KeyCode.Space] = MovePieceDown;
-		InputMap[KeyCode.LeftArrow] = MovePieceLeft;
-		InputMap[KeyCode.RightArrow] = MovePieceRight;
-		InputMap[KeyCode.UpArrow] = RotatePieceCW;
-		InputMap[KeyCode.DownArrow] = RotatePieceCCW;
-	}
-	
-	void NoPieceFallingInput()
-	{
-		InputMap[KeyCode.Space] = CreateRandomPiece;	// TODO -- DoNothing
-		InputMap[KeyCode.LeftArrow] = DoNothing;
-		InputMap[KeyCode.RightArrow] = DoNothing;
-		InputMap[KeyCode.UpArrow] = DoNothing;
-		InputMap[KeyCode.DownArrow] = DoNothing;
-	}
-	
-	public KeyCode CheckForInput()
-	{
-		// TODO -- lots more in here.  Simple dev test.
-		// TODO -- is there really no better way to do this?  Can I not just get keyboard events directly?
-		if (Input.GetKey(KeyCode.Space))
-		{
-			return KeyCode.Space;
-		}
-		else if (Input.GetKey(KeyCode.LeftArrow))
-		{
-			return KeyCode.LeftArrow;
-		}
-		else if (Input.GetKey(KeyCode.RightArrow))
-		{
-			return KeyCode.RightArrow;
-		}
-		else if (Input.GetKey(KeyCode.UpArrow))
-		{
-			return KeyCode.UpArrow;
-		}
-		else if (Input.GetKey(KeyCode.DownArrow))
-		{
-			return KeyCode.DownArrow;
-		}
-		else
-		{
-			return KeyCode.None;
-		}
-	}
-	
-	void HandleInput()
-	{
-		KeyCode inputType = CheckForInput();
-		if (InputMap.ContainsKey(inputType))
-		{
-			InputMap[inputType]();
-		}
-	}
-	
-	void DoNothing()
+	public void DoNothing()
 	{
 	}
 	
-	void MovePieceLeft()
+	public void MovePieceLeft()
 	{		
 		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
 		dropScript.MovePieceLeft();
 	}
 	
-	void MovePieceRight()
+	public void MovePieceRight()
 	{
 		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
 		dropScript.MovePieceRight();
 	}
 	
-	void RotatePieceCW()
+	public void RotatePieceCW()
 	{
 		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
 		dropScript.RotatePieceCW();
 	}
 	
-	void RotatePieceCCW()
+	public void RotatePieceCCW()
 	{
 		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
 		dropScript.RotatePieceCCW();
 	}
 	
-	void MovePieceDown()
+	public void MovePieceDown()
 	{
 		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
 		dropScript.MovePieceDown();
@@ -246,13 +181,20 @@ public class MainLoop : MonoBehaviour
 	#endregion // input
 	
 	// Update is called once per frame
-	void Update ()
+	void Update()
 	{
-		// TODO -- decide if it's time to drop a piece
-		//         handle game pause -- or not?  Maybe something else just pauses this and the Drop script?
-		//  TODO -- preview next piece to drop while waiting.
+		// TODO list:
+		//
+		//	Automatic piece drops
+		//	Game modes - paused, main menu, playing
+		//	Clear complete lines
+		//	Update current drop speed based on # lines completed
+		//	Debounce key input
+		//	Preview next piece to drop
+		//	Rotate pieces
+		//	Disallow pieces hanging off top of board (IE: extend board edges up 3 or 4 more rows.
 		
-		HandleInput();
+		
 		
 		CheckForCompleteLines();
 	}

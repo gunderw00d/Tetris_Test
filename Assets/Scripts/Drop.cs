@@ -120,8 +120,6 @@ public class Drop : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		// TODO -- input handling - rotate, shift left/right - be sure to test against pieces on board/edges
-		
 		if (FrameCount <= DropOnFrame)
 		{
 			FrameCount += 1;
