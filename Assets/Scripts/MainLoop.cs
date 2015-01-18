@@ -5,8 +5,9 @@ using System.Collections.Generic;
 public class MainLoop : MonoBehaviour
 {
 	#region vars
-	public int BoardHeight = 21;
-	public int BoardWidth = 12;
+	public int BoardHeight = 20;
+	public int BoardWidth = 10;
+	public int BoardTopBufferHeight = 4;
 	
 	bool[,] mBoard;
 	
@@ -15,12 +16,10 @@ public class MainLoop : MonoBehaviour
 	
 	Transform CurrentFallingPiece = null;
 	
-	public Transform BorderRow;
-	public Transform BorderedEdgesRow;
-	
 	public Transform StartLocation;
 	public Transform TileContainer;
 	public Transform Background;
+	public Transform GridLocation;
 	
 	public int CurrentLevel = 0;
 
@@ -36,14 +35,12 @@ public class MainLoop : MonoBehaviour
 		// Init board with a 1-tile boarder on sides and bottom, top is open, all other slots open
 		mBoard = new bool[BoardHeight, BoardWidth];
 		
-		Vector3 loc = Background.position;
-		
-		CreateBorderRow(loc, 0);
-		
-		for (int row = 1; row < BoardHeight; row++)
+		for (int row = 0; row < BoardHeight; row++)
 		{
-			loc.y += 1;
-			CreateBorderedEdgesRow(loc, row);
+			for (int column = 0; column < BoardWidth; column++)
+			{
+				mBoard[row, column] = false;
+			}
 		}
 		
 		Random.seed = (int)System.DateTime.Now.Ticks;
@@ -51,53 +48,29 @@ public class MainLoop : MonoBehaviour
 		InputHandlerScript = gameObject.GetComponent<InputHandler>();
 	}
 	
-	void CreateBorderRow(Vector3 loc, int rowNumber)
-	{
-		Transform borderRow = Instantiate(BorderRow, loc, Quaternion.identity) as Transform;		
-		borderRow.gameObject.transform.parent = Background.gameObject.transform;
-		
-		for (int column = 0; column < BoardWidth; column++) // Bottom row is all border
-		{
-			mBoard[rowNumber, column] = true;
-		}
-	}
-	
-	void CreateBorderedEdgesRow(Vector3 loc, int rowNum)
-	{
-		Transform borderedEdgesRow = Instantiate(BorderedEdgesRow, loc, Quaternion.identity) as Transform;		
-		borderedEdgesRow.gameObject.transform.parent = Background.gameObject.transform;
-		
-		mBoard[rowNum, 0] = true;
-		for (int column = 1; column < (BoardWidth - 1); column++)
-		{
-			mBoard[rowNum, column] = false;
-		}
-		mBoard[rowNum, BoardWidth - 1] = true;
-	}
 	#endregion // init
 	
 	#region grid utility
 	public void TranslateCoordtoGridCell(float x, float y, out int gridColumn, out int gridRow)
 	{
-		gridColumn = Mathf.FloorToInt(x - Background.position.x);
-		gridRow = Mathf.FloorToInt(y - Background.position.y);
+		gridColumn = Mathf.FloorToInt(x - GridLocation.position.x);
+		gridRow = Mathf.FloorToInt(y - GridLocation.position.y);
 	}
 	
-	bool InGridRange(int gridColumn, int gridRow)
+	public bool InGridRange(int gridColumn, int gridRow)
 	{
 		return (gridRow >= 0) && (gridRow < BoardHeight) && (gridColumn >= 0) && (gridColumn < BoardWidth);
 	}
 	
+	public bool InGirdBuffer(int gridColumn, int gridRow)
+	{
+		return (((gridRow >= BoardHeight) && (gridRow < (BoardHeight + BoardTopBufferHeight))) &&
+				((gridColumn >= 0) && (gridColumn < BoardWidth)));
+	}
+	
 	public bool GridCellOccupied(int gridColumn, int gridRow)
 	{
-		if (InGridRange(gridColumn, gridRow))
-		{
-			return mBoard[gridRow, gridColumn];
-		}
-		else
-		{
-			return false;	// Grid isn't there, so... no, not occupied.
-		}
+		return mBoard[gridRow, gridColumn];
 	}
 	
 	public void OccupyGridCell(int gridColumn, int gridRow)
@@ -189,7 +162,7 @@ public class MainLoop : MonoBehaviour
 		//	Game modes - paused, main menu, playing
 		//	Clear complete lines
 		//	Update current drop speed based on # lines completed
-		//	Debounce key input
+		//	DONE - Debounce key input
 		//	Preview next piece to drop
 		//	Rotate pieces
 		//	Disallow pieces hanging off top of board (IE: extend board edges up 3 or 4 more rows.

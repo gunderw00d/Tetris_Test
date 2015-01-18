@@ -30,10 +30,18 @@ public class Drop : MonoBehaviour
 			if (t.gameObject != this.gameObject)
 			{
 				Vector3 newLoc = transform.position + t.localPosition + offset;
-				int gridX = 0;
-				int gridY = 0;
-				mlScript.TranslateCoordtoGridCell(newLoc.x, newLoc.y, out gridX, out gridY);
-				if (mlScript.GridCellOccupied(gridX, gridY))
+				int gridColumn = 0;
+				int gridRow = 0;
+				mlScript.TranslateCoordtoGridCell(newLoc.x, newLoc.y, out gridColumn, out gridRow);
+				if (mlScript.InGirdBuffer(gridColumn, gridRow))
+				{
+					continue;
+				}
+				if (!mlScript.InGridRange(gridColumn, gridRow))
+				{
+					return false;
+				}
+				if (mlScript.GridCellOccupied(gridColumn, gridRow))
 				{
 					return false;
 				}
