@@ -23,9 +23,11 @@ public class MainLoop : MonoBehaviour
 	
 	public int CurrentLevel = 0;
 
-	
 	public delegate void dInputAction();
 	InputHandler InputHandlerScript;
+	
+	public bool DEBUG_DisableDrop = false;
+	public bool DEBUG_DisplayBuffer = false;
 	
 	#endregion // vars
 

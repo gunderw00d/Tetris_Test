@@ -77,6 +77,12 @@ public class Drop : MonoBehaviour
 	
 	public void MovePieceDown()
 	{
+		MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
+		if (mlScript.DEBUG_DisableDrop)
+		{
+			return;
+		}
+		
 		Vector3 moveDown = new Vector3(0, yStep, 0);
 		
 		bool canMoveDown = AllSpotsOpen(moveDown);
