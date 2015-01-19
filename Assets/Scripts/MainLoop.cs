@@ -13,6 +13,10 @@ public class MainLoop : MonoBehaviour
 	
 	public Transform[] PiecePrefabs = new Transform[7];
 	public int[] LevelDropFrames = new int[10];
+	public int[] RowsToLevelUp = new int[9];
+	
+	public int CompletedRows = 0;
+	public int Score = 0;
 	
 	Transform CurrentFallingPiece = null;
 	Transform NextPiecePreview = null;
@@ -86,13 +90,75 @@ public class MainLoop : MonoBehaviour
 		}
 	}
 	#endregion // grid utility
-
-	#region piece management
-	void CheckForCompleteLines()
+	
+	
+	int FindFullRows(bool[] fullRows)
 	{
-		// TODO -- remove complete lines, increment completed line count, check for level up.
+		int retCount = fullRows.Length;
+		
+		for (int row = 0; row < BoardHeight; row++)
+		{
+			fullRows[row] = true;
+			for (int column = 0; column < BoardWidth; column++)
+			{
+				if (mBoard[row,column] == false)
+				{
+					fullRows[row] = false;
+					retCount--;
+					break;
+				}
+			}
+		}
+		
+		return retCount;
 	}
 	
+	void CompactBoard(bool[] fullRows)
+	{
+		int row = 0;
+		
+		while (row < BoardHeight)
+		{
+			if (fullRows[row])
+			{
+				int numFull = 1;
+				// Find how many consecutive rows are full
+				// remove all tiles in those rows
+				// pull everything down.
+			}
+			
+			row++;
+		}
+	}
+	
+	void ScoreFullRows(int fullRowCount)
+	{
+		Score += fullRowCount * 10;	// TODO -- better calculation.
+	}
+	
+	void HandleLevelUp(int fullRowCount)
+	{
+		CompletedRows += fullRowCount;
+		
+		if (CurrentLevel < RowsToLevelUp.Length)
+		{
+			if (RowsToLevelUp[CurrentLevel] < CompletedRows)
+			{
+				CurrentLevel++;
+			}
+		}
+	}
+	
+	void ClearCompleteLines()
+	{
+		bool [] fullRows = new bool[BoardHeight];
+		int fullRowCount = FindFullRows(fullRows);
+		ScoreFullRows(fullRowCount);
+		CompactBoard(fullRows);
+		HandleLevelUp(fullRowCount);
+	}
+	
+	#region piece management
 	public void DestroyCurrentPiece()
 	{
 		Destroy(CurrentFallingPiece.gameObject);
@@ -122,7 +188,6 @@ public class MainLoop : MonoBehaviour
 		}
 		NextPiecePreview = newPiece;
 	}
-	
 	
 	void CreateRandomPiece()
 	{
@@ -154,8 +219,6 @@ public class MainLoop : MonoBehaviour
 			CreatePieceInSequence();
 		}
 	}
-	
-	
 	#endregion // piece management
 	
 	#region input
@@ -203,16 +266,16 @@ public class MainLoop : MonoBehaviour
 		//
 		//	Automatic piece drops
 		//	Game modes - paused, main menu, playing
+		//	Game Over - Piece decomposed with any part on buffer?  Or all on buffer?  Back to pre-game start mode.
 		//	Clear complete lines
 		//	Update current drop speed based on # lines completed
-		//	Preview next piece to drop
-		//	Game Over - create piece on top of existing piece.  Back to pre-game start mode.
+		//	DONE - Preview next piece to drop
 		//	DONE - Debounce key input
 		//	DONE - Rotate pieces
 		//	DONE - Disallow pieces hanging off top of board (IE: extend board edges up 3 or 4 more rows.
 		
 		
 		
-		CheckForCompleteLines();
+		ClearCompleteLines();
 	}
 }

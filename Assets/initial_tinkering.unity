@@ -3586,6 +3586,9 @@ MonoBehaviour:
   - {fileID: 484300, guid: f6ae4b28c81b3404483dcd712e37e7b7, type: 2}
   - {fileID: 480474, guid: 5df1fc938a3393b4b8370567efdf9af9, type: 2}
   LevelDropFrames: 2d00000028000000230000001e00000019000000140000000f0000000a0000000500000000000000
+  RowsToLevelUp: 0a0000000a0000000a0000000a0000000a0000000a0000000a0000000a0000000a0000000a000000
+  CompletedRows: 0
+  Score: 0
   NextPiecePreviewLocation: {fileID: 614775556}
   StartLocation: {fileID: 345175963}
   TileContainer: {fileID: 263889790}
