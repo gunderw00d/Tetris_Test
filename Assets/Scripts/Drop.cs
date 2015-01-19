@@ -128,67 +128,32 @@ public class Drop : MonoBehaviour
 		}
 	}
 	
+	Vector3 CWRotate = new Vector3(1f, -1f, 1f);
 	public void RotatePieceCW()
 	{
 		// newX = y;
 		// newY = -x;
-
-		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
-		
-		foreach (Transform t in tileXForms)
-		{
-			if (t.gameObject != this.gameObject)
-			{
-				Vector3 newLoc = t.localPosition;
-				float newX = newLoc.y;
-				float newY = newLoc.x * -1f;
-				newLoc.x = newX;
-				newLoc.y = newY;
-				
-				newLoc = transform.position + newLoc;
-				
-				if (!SpotOpen(newLoc))
-				{
-					return;
-				}
-			}
-		}
-		
-		// easier to redo the calc than store each sub-component w/ their new offset and apply after all passed.
-		// TODO -- if this proves too slow, figure out a way to cache calc and apply rather than recalc
-		
-		foreach (Transform t in tileXForms)
-		{
-			if (t.gameObject != this.gameObject)
-			{
-				Vector3 newLoc = t.localPosition;
-				float newX = newLoc.y;
-				float newY = newLoc.x * -1f;
-				newLoc.x = newX;
-				newLoc.y = newY;
-				
-				t.localPosition = newLoc;
-			}
-		}
+		RotatePiece(CWRotate);
 	}
 	
+	Vector3 CCWRotate = new Vector3(-1f, 1f, 1f);
 	public void RotatePieceCCW()
 	{
 		// newX = -y;
 		// newY = x;
-		
+		RotatePiece(CCWRotate);
+	}
+	
+	public void RotatePiece(Vector3 offset)
+	{
 		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
 		
 		foreach (Transform t in tileXForms)
 		{
 			if (t.gameObject != this.gameObject)
 			{
-				Vector3 newLoc = t.localPosition;
-				float newX = newLoc.y * -1f;
-				float newY = newLoc.x;
-				newLoc.x = newX;
-				newLoc.y = newY;
-				
+				// swap x and y
+				Vector3 newLoc = new Vector3(t.localPosition.y * offset.x, t.localPosition.x * offset.y, t.localPosition.z * offset.z);
 				newLoc = transform.position + newLoc;
 				
 				if (!SpotOpen(newLoc))
@@ -205,12 +170,7 @@ public class Drop : MonoBehaviour
 		{
 			if (t.gameObject != this.gameObject)
 			{
-				Vector3 newLoc = t.localPosition;
-				float newX = newLoc.y * -1f;
-				float newY = newLoc.x;
-				newLoc.x = newX;
-				newLoc.y = newY;
-				
+				Vector3 newLoc = new Vector3(t.localPosition.y * offset.x, t.localPosition.x * offset.y, t.localPosition.z * offset.z);
 				t.localPosition = newLoc;
 			}
 		}
