@@ -20,28 +20,41 @@ public class Drop : MonoBehaviour
 		FrameCount = 0;
 	}
 	
+	bool SpotOpen(Vector3 worldLoc)
+	{
+		MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
+		
+		int gridColumn = 0;
+		int gridRow = 0;
+		mlScript.TranslateCoordtoGridCell(worldLoc.x, worldLoc.y, out gridColumn, out gridRow);
+		
+		if (mlScript.InGirdBuffer(gridColumn, gridRow))
+		{
+			return true;
+		}
+		if (!mlScript.InGridRange(gridColumn, gridRow))
+		{
+			return false;
+		}
+		if (mlScript.GridCellOccupied(gridColumn, gridRow))
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
 	bool AllSpotsOpen(Vector3 offset)
 	{
 		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
-		MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
 		
 		foreach (Transform t in tileXForms)
 		{
 			if (t.gameObject != this.gameObject)
 			{
 				Vector3 newLoc = transform.position + t.localPosition + offset;
-				int gridColumn = 0;
-				int gridRow = 0;
-				mlScript.TranslateCoordtoGridCell(newLoc.x, newLoc.y, out gridColumn, out gridRow);
-				if (mlScript.InGirdBuffer(gridColumn, gridRow))
-				{
-					continue;
-				}
-				if (!mlScript.InGridRange(gridColumn, gridRow))
-				{
-					return false;
-				}
-				if (mlScript.GridCellOccupied(gridColumn, gridRow))
+				
+				if (!SpotOpen(newLoc))
 				{
 					return false;
 				}
@@ -123,12 +136,97 @@ public class Drop : MonoBehaviour
 	
 	public void RotatePieceCW()
 	{
-		// TODO
+		// newX = y;
+		// newY = -x;
+		// x = newX;
+		// y = newY;
+
+		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
+		
+		foreach (Transform t in tileXForms)
+		{
+			if (t.gameObject != this.gameObject)
+			{
+				Vector3 newLoc = t.localPosition;
+				float newX = newLoc.y;
+				float newY = newLoc.x * -1f;
+				newLoc.x = newX;
+				newLoc.y = newY;
+				
+				newLoc = transform.position + newLoc;
+				
+				if (!SpotOpen(newLoc))
+				{
+					return;
+				}
+			}
+		}
+		
+		// easier to redo the calc than store each sub-component w/ their new offset and apply after all passed.
+		// TODO -- if this proves too slow, figure out a way to cache calc and apply rather than recalc
+		
+		foreach (Transform t in tileXForms)
+		{
+			if (t.gameObject != this.gameObject)
+			{
+				Vector3 newLoc = t.localPosition;
+				float newX = newLoc.y;
+				float newY = newLoc.x * -1f;
+				newLoc.x = newX;
+				newLoc.y = newY;
+				
+				t.localPosition = newLoc;
+			}
+		}
 	}
 	
 	public void RotatePieceCCW()
 	{
-		// TODO
+		// TODO -- newX = -y,  newY = x?
+	
+	
+		// newX = y;
+		// newY = -x;
+		// x = newX;
+		// y = newY;
+		
+		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
+		
+		foreach (Transform t in tileXForms)
+		{
+			if (t.gameObject != this.gameObject)
+			{
+				Vector3 newLoc = t.localPosition;
+				float newX = newLoc.y;
+				float newY = newLoc.x * -1f;
+				newLoc.x = newX;
+				newLoc.y = newY;
+				
+				newLoc = transform.position + newLoc;
+				
+				if (!SpotOpen(newLoc))
+				{
+					return;
+				}
+			}
+		}
+		
+		// easier to redo the calc than store each sub-component w/ their new offset and apply after all passed.
+		// TODO -- if this proves too slow, figure out a way to cache calc and apply rather than recalc
+		
+		foreach (Transform t in tileXForms)
+		{
+			if (t.gameObject != this.gameObject)
+			{
+				Vector3 newLoc = t.localPosition;
+				float newX = newLoc.y;
+				float newY = newLoc.x * -1f;
+				newLoc.x = newX;
+				newLoc.y = newY;
+				
+				t.localPosition = newLoc;
+			}
+		}
 	}
 	
 	// Update is called once per frame

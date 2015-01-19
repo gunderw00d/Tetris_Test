@@ -167,7 +167,7 @@ public class MainLoop : MonoBehaviour
 		//	DONE - Debounce key input
 		//	Preview next piece to drop
 		//	Rotate pieces
-		//	Disallow pieces hanging off top of board (IE: extend board edges up 3 or 4 more rows.
+		//	DONE - Disallow pieces hanging off top of board (IE: extend board edges up 3 or 4 more rows.
 		
 		
 		

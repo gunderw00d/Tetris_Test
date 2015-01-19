@@ -2752,7 +2752,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 345175962}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.5, y: 5.5, z: 0}
+  m_LocalPosition: {x: 6.5, y: 20.5, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -3591,6 +3591,8 @@ MonoBehaviour:
   Background: {fileID: 1538561059}
   GridLocation: {fileID: 1944809326}
   CurrentLevel: 0
+  DEBUG_DisableDrop: 0
+  DEBUG_DisplayBuffer: 0
 --- !u!4 &451203006
 Transform:
   m_ObjectHideFlags: 0
