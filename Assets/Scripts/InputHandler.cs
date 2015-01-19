@@ -55,7 +55,7 @@ public class InputHandler : MonoBehaviour
 		InputMaps[(int)ActiveMapType.Playing][KeyCode.None] = mDoNothing;
 		
 		// TODO -- DoNothing
-		InputMaps[(int)ActiveMapType.NoPiece][KeyCode.Space] = new InputData(MainLoopScript.CreateRandomPiece, DebounceInterval);
+		InputMaps[(int)ActiveMapType.NoPiece][KeyCode.Space] = new InputData(MainLoopScript.CreateNextPiece, DebounceInterval);
 		InputMaps[(int)ActiveMapType.NoPiece][KeyCode.LeftArrow] = mDoNothing;
 		InputMaps[(int)ActiveMapType.NoPiece][KeyCode.RightArrow] = mDoNothing;
 		InputMaps[(int)ActiveMapType.NoPiece][KeyCode.UpArrow] = mDoNothing;

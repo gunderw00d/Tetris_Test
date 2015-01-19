@@ -3593,6 +3593,7 @@ MonoBehaviour:
   CurrentLevel: 0
   DEBUG_DisableDrop: 0
   DEBUG_DisplayBuffer: 0
+  DEBUG_CreatePiecesRandom: 1
 --- !u!4 &451203006
 Transform:
   m_ObjectHideFlags: 0

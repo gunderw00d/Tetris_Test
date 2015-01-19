@@ -90,12 +90,6 @@ public class Drop : MonoBehaviour
 	
 	public void MovePieceDown()
 	{
-		MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
-		if (mlScript.DEBUG_DisableDrop)
-		{
-			return;
-		}
-		
 		Vector3 moveDown = new Vector3(0, yStep, 0);
 		
 		bool canMoveDown = AllSpotsOpen(moveDown);
@@ -138,8 +132,6 @@ public class Drop : MonoBehaviour
 	{
 		// newX = y;
 		// newY = -x;
-		// x = newX;
-		// y = newY;
 
 		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
 		
@@ -182,13 +174,8 @@ public class Drop : MonoBehaviour
 	
 	public void RotatePieceCCW()
 	{
-		// TODO -- newX = -y,  newY = x?
-	
-	
-		// newX = y;
-		// newY = -x;
-		// x = newX;
-		// y = newY;
+		// newX = -y;
+		// newY = x;
 		
 		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
 		
@@ -197,8 +184,8 @@ public class Drop : MonoBehaviour
 			if (t.gameObject != this.gameObject)
 			{
 				Vector3 newLoc = t.localPosition;
-				float newX = newLoc.y;
-				float newY = newLoc.x * -1f;
+				float newX = newLoc.y * -1f;
+				float newY = newLoc.x;
 				newLoc.x = newX;
 				newLoc.y = newY;
 				
@@ -219,8 +206,8 @@ public class Drop : MonoBehaviour
 			if (t.gameObject != this.gameObject)
 			{
 				Vector3 newLoc = t.localPosition;
-				float newX = newLoc.y;
-				float newY = newLoc.x * -1f;
+				float newX = newLoc.y * -1f;
+				float newY = newLoc.x;
 				newLoc.x = newX;
 				newLoc.y = newY;
 				
@@ -232,6 +219,13 @@ public class Drop : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
+		
+		if (mlScript.DEBUG_DisableDrop)
+		{
+			return;
+		}
+		
 		if (FrameCount <= DropOnFrame)
 		{
 			FrameCount += 1;

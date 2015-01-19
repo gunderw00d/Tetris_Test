@@ -28,6 +28,7 @@ public class MainLoop : MonoBehaviour
 	
 	public bool DEBUG_DisableDrop = false;
 	public bool DEBUG_DisplayBuffer = false;
+	public bool DEBUG_CreatePiecesRandom = true;
 	
 	#endregion // vars
 
@@ -108,13 +109,38 @@ public class MainLoop : MonoBehaviour
 		InputHandlerScript.NoPieceFallingInput();
 	}
 	
-	// TODO -- temp public - remove after dev
-	public void CreateRandomPiece()
+	void CreateRandomPiece()
 	{
 		int pieceIndex = Random.Range(0, PiecePrefabs.Length);
 		
 		CreatePiece(LevelDropFrames[CurrentLevel], PiecePrefabs[pieceIndex]);
 	}
+	
+	int PieceIndex = 0;
+	void CreatePieceInSequence()
+	{
+		if (PieceIndex >= PiecePrefabs.Length)
+		{
+			PieceIndex = 0;
+		}
+		
+		CreatePiece(LevelDropFrames[CurrentLevel], PiecePrefabs[PieceIndex]);
+		PieceIndex++;
+	}
+	
+	public void CreateNextPiece()
+	{
+		if (DEBUG_CreatePiecesRandom)
+		{
+			CreateRandomPiece();
+		}
+		else
+		{
+			CreatePieceInSequence();
+		}
+	}
+	
+	
 	#endregion // piece management
 	
 	#region input
@@ -164,9 +190,10 @@ public class MainLoop : MonoBehaviour
 		//	Game modes - paused, main menu, playing
 		//	Clear complete lines
 		//	Update current drop speed based on # lines completed
-		//	DONE - Debounce key input
 		//	Preview next piece to drop
-		//	Rotate pieces
+		//	Game Over - create piece on top of existing piece.  Back to pre-game start mode.
+		//	DONE - Debounce key input
+		//	DONE - Rotate pieces
 		//	DONE - Disallow pieces hanging off top of board (IE: extend board edges up 3 or 4 more rows.
 		
 		
