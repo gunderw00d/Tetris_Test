@@ -15,7 +15,9 @@ public class MainLoop : MonoBehaviour
 	public int[] LevelDropFrames = new int[10];
 	
 	Transform CurrentFallingPiece = null;
+	Transform NextPiecePreview = null;
 	
+	public Transform NextPiecePreviewLocation;
 	public Transform StartLocation;
 	public Transform TileContainer;
 	public Transform Background;
@@ -91,23 +93,36 @@ public class MainLoop : MonoBehaviour
 		// TODO -- remove complete lines, increment completed line count, check for level up.
 	}
 	
-	void CreatePiece(int dropOnFrame, Transform piecePrefab)
-	{
-		CurrentFallingPiece = Instantiate(piecePrefab, StartLocation.transform.position, Quaternion.identity) as Transform;
-		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>(); 
-		dropScript.TileContainer = TileContainer;
-		dropScript.MainLoopScriptObject = this.gameObject;
-		dropScript.DropOnFrame = dropOnFrame;
-		
-		InputHandlerScript.PieceFallingInput();
-	}
-	
 	public void DestroyCurrentPiece()
 	{
 		Destroy(CurrentFallingPiece.gameObject);
 		CurrentFallingPiece = null;
 		InputHandlerScript.NoPieceFallingInput();
 	}
+	
+	void CreatePiece(int dropOnFrame, Transform piecePrefab)
+	{
+		Transform newPiece = Instantiate(piecePrefab, NextPiecePreviewLocation.transform.position, Quaternion.identity) as Transform;
+		
+		Drop dropScript = newPiece.gameObject.GetComponent<Drop>(); 
+		dropScript.TileContainer = TileContainer;
+		dropScript.MainLoopScriptObject = this.gameObject;
+		dropScript.DropOnFrame = dropOnFrame;
+		dropScript.HoldInPlace = true;
+		
+		if (NextPiecePreview != null)
+		{
+			CurrentFallingPiece = NextPiecePreview;
+			CurrentFallingPiece.transform.position = StartLocation.transform.position;
+			
+			Drop cfpDropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>(); 
+			cfpDropScript.HoldInPlace = DEBUG_DisableDrop;
+
+			InputHandlerScript.PieceFallingInput();
+		}
+		NextPiecePreview = newPiece;
+	}
+	
 	
 	void CreateRandomPiece()
 	{

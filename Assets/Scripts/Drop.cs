@@ -11,6 +11,8 @@ public class Drop : MonoBehaviour
 	public Transform IndividualTile;
 	public Transform TileContainer;
 	
+	public bool HoldInPlace;	// "gravity" doesn't affect this piece, leave it be.
+	
 	public GameObject MainLoopScriptObject;
 	#endregion // vars
 	
@@ -179,9 +181,7 @@ public class Drop : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
-		
-		if (mlScript.DEBUG_DisableDrop)
+		if (HoldInPlace)
 		{
 			return;
 		}
