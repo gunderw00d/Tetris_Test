@@ -2,6 +2,85 @@
 using System.Collections;
 using System.Collections.Generic;
 
+class LooseTileManager
+{
+	#region vars
+	public Transform TileContainer;
+	public MainLoop mlScript;
+	#endregion // vars
+	
+	Transform FindRowContainer(int row)
+	{
+		Component[] rowContainerXForms = TileContainer.gameObject.GetComponentsInChildren<Transform>();
+		
+		foreach (Transform t in rowContainerXForms)
+		{
+			if (t.gameObject != TileContainer.gameObject)
+			{
+				if ((int)t.localPosition.y == row)
+				{
+					return t;
+				}
+			}
+		}
+		
+		return TileContainer;
+	}
+	
+	public void AddTile(Transform tileInstance, Vector3 loc)
+	{
+		int gridColumn = 0;
+		int gridRow = 0;
+		mlScript.TranslateCoordtoGridCell(loc.x, loc.y, out gridColumn, out gridRow);
+		
+		Transform rowContainer = FindRowContainer(gridRow);
+
+		tileInstance.gameObject.transform.parent = rowContainer.gameObject.transform;
+		
+		mlScript.OccupyGridCell(gridColumn, gridRow);
+	}
+	
+	public void ClearRow(int row)
+	{
+		Transform rowContainer = FindRowContainer(row);
+		
+		Component[] tiles = rowContainer.gameObject.GetComponentsInChildren<Transform>();
+		
+		foreach (Transform t in tiles)
+		{
+			if (t.gameObject != rowContainer.gameObject)
+			{
+				mlScript.DestroyTile(t);
+			}
+		}
+	}
+	
+	public void CompactTiles(int startGridRow)
+	{
+		// TODO -- compact all tiles down 1 row, starting at row above 'startGridRow'
+		
+		for (int row = startGridRow; row < (mlScript.BoardHeight - 2); row++)
+		{
+			Transform targetRow = FindRowContainer(row);
+			Transform sourceRow = FindRowContainer(row + 1);
+			
+			Component[] sourceTiles = sourceRow.gameObject.GetComponentsInChildren<UnityEngine.Transform>();
+			
+			foreach (UnityEngine.Transform t in sourceTiles)
+			{
+				if (t.gameObject != sourceRow.gameObject)
+				{
+					t.gameObject.transform.parent = targetRow.gameObject.transform;
+					
+					// TODO -- do I need to translate the tiles down by 1?
+				}
+			}
+		}
+		
+	}
+	
+};
+
 public class MainLoop : MonoBehaviour
 {
 	#region vars
@@ -15,6 +94,7 @@ public class MainLoop : MonoBehaviour
 	public int[] LevelDropFrames = new int[10];
 	public int[] RowsToLevelUp = new int[9];
 	
+	public int CurrentLevel = 0;
 	public int CompletedRows = 0;
 	public int Score = 0;
 	
@@ -27,7 +107,7 @@ public class MainLoop : MonoBehaviour
 	public Transform Background;
 	public Transform GridLocation;
 	
-	public int CurrentLevel = 0;
+	LooseTileManager TileManager;
 
 	public delegate void dInputAction();
 	InputHandler InputHandlerScript;
@@ -39,7 +119,7 @@ public class MainLoop : MonoBehaviour
 	#endregion // vars
 
 	#region init
-	void Start ()
+	void Start()
 	{
 		// Init board with a 1-tile boarder on sides and bottom, top is open, all other slots open
 		mBoard = new bool[BoardHeight, BoardWidth];
@@ -55,6 +135,11 @@ public class MainLoop : MonoBehaviour
 		Random.seed = (int)System.DateTime.Now.Ticks;
 		
 		InputHandlerScript = gameObject.GetComponent<InputHandler>();
+		
+		TileManager = new LooseTileManager();
+		
+		TileManager.TileContainer = TileContainer;
+		TileManager.mlScript = this;
 	}
 	
 	#endregion // init
@@ -64,6 +149,12 @@ public class MainLoop : MonoBehaviour
 	{
 		gridColumn = Mathf.FloorToInt(x - GridLocation.position.x);
 		gridRow = Mathf.FloorToInt(y - GridLocation.position.y);
+	}
+	
+	void TranslateGridCelltoCoord(int gridColumn, int gridRow, out float x, out float y)
+	{
+		x = GridLocation.position.x + gridColumn;
+		y = GridLocation.position.y + gridRow;
 	}
 	
 	public bool InGridRange(int gridColumn, int gridRow)
@@ -89,8 +180,44 @@ public class MainLoop : MonoBehaviour
 			mBoard[gridRow, gridColumn] = true;
 		}
 	}
+	
+	void ClearGridCell(int gridColumn, int gridRow)
+	{
+		if (InGridRange(gridColumn, gridRow))
+		{
+			mBoard[gridRow, gridColumn] = false;
+		}
+	}
+	
+	void ClearGridRow(int gridRow)
+	{
+		if ((gridRow >= 0) && (gridRow < BoardHeight))
+		{
+			for (int column = 0; column < BoardWidth; column++)
+			{
+				mBoard[gridRow, column] = false;
+			}
+		}
+	}
+	
+	void CompactGrid(int startGridRow)
+	{
+		// TODO - compact all rows down by one, starting at startGridRow and working up
+	}
+	
 	#endregion // grid utility
 	
+	#region clear rows
+	public void CreateTile(Transform tile, Vector3 loc)
+	{
+		Transform tileInstance = Instantiate(tile, loc, Quaternion.identity) as Transform;
+		TileManager.AddTile(tileInstance, loc);
+	}
+	
+	public void DestroyTile(Transform tileInstance)
+	{
+		Destroy(tileInstance);
+	}
 	
 	int FindFullRows(bool[] fullRows)
 	{
@@ -113,21 +240,21 @@ public class MainLoop : MonoBehaviour
 		return retCount;
 	}
 	
-	void CompactBoard(bool[] fullRows)
+	void RemoveFullRows(bool[] fullRows)
 	{
-		int row = 0;
+		int row = BoardHeight - 1;
 		
-		while (row < BoardHeight)
+		while (row >= 0)
 		{
 			if (fullRows[row])
 			{
-				int numFull = 1;
-				// Find how many consecutive rows are full
-				// remove all tiles in those rows
-				// pull everything down.
+				ClearGridRow(row);
+				CompactGrid(row);
+				TileManager.ClearRow(row);
+				TileManager.CompactTiles(row);
 			}
 			
-			row++;
+			row--;
 		}
 	}
 	
@@ -153,10 +280,14 @@ public class MainLoop : MonoBehaviour
 	{
 		bool [] fullRows = new bool[BoardHeight];
 		int fullRowCount = FindFullRows(fullRows);
-		ScoreFullRows(fullRowCount);
-		CompactBoard(fullRows);
-		HandleLevelUp(fullRowCount);
+		if (fullRowCount > 0)
+		{
+			RemoveFullRows(fullRows);
+			//ScoreFullRows(fullRowCount);
+			//HandleLevelUp(fullRowCount);
+		}
 	}
+	#endregion // clear rows
 	
 	#region piece management
 	public void DestroyCurrentPiece()
@@ -171,7 +302,6 @@ public class MainLoop : MonoBehaviour
 		Transform newPiece = Instantiate(piecePrefab, NextPiecePreviewLocation.transform.position, Quaternion.identity) as Transform;
 		
 		Drop dropScript = newPiece.gameObject.GetComponent<Drop>(); 
-		dropScript.TileContainer = TileContainer;
 		dropScript.MainLoopScriptObject = this.gameObject;
 		dropScript.DropOnFrame = dropOnFrame;
 		dropScript.HoldInPlace = true;

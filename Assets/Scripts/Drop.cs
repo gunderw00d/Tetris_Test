@@ -9,7 +9,6 @@ public class Drop : MonoBehaviour
 	public float yStep = -1;
 	public float BottomYValue = 2;
 	public Transform IndividualTile;
-	public Transform TileContainer;
 	
 	public bool HoldInPlace;	// "gravity" doesn't affect this piece, leave it be.
 	
@@ -22,6 +21,7 @@ public class Drop : MonoBehaviour
 		FrameCount = 0;
 	}
 	
+	// TODO - move into MainLoop.cs
 	bool SpotOpen(Vector3 worldLoc)
 	{
 		MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
@@ -76,20 +76,14 @@ public class Drop : MonoBehaviour
 			if (t.gameObject != this.gameObject)
 			{
 				Vector3 newLoc = transform.position + t.localPosition;
-				Transform tileInstance = Instantiate(IndividualTile, newLoc, Quaternion.identity) as Transform;
-				tileInstance.gameObject.transform.parent = TileContainer.gameObject.transform;
-				
-				int gridColumn = 0;
-				int gridRow = 0;
-				mlScript.TranslateCoordtoGridCell(newLoc.x, newLoc.y, out gridColumn, out gridRow);
-				mlScript.OccupyGridCell(gridColumn, gridRow);
+				mlScript.CreateTile(IndividualTile, newLoc);
 			}
 		}
-		
 		
 		mlScript.DestroyCurrentPiece();
 	}
 	
+	#region movement
 	public void MovePieceDown()
 	{
 		Vector3 moveDown = new Vector3(0, yStep, 0);
@@ -177,6 +171,7 @@ public class Drop : MonoBehaviour
 			}
 		}
 	}
+	#endregion // movement
 	
 	// Update is called once per frame
 	void Update()
