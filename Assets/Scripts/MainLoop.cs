@@ -5,26 +5,30 @@ using System.Collections.Generic;
 class LooseTileManager
 {
 	#region vars
-	public Transform TileContainer;
-	public MainLoop mlScript;
+	Transform TileContainer;
+	MainLoop mlScript;
+	int BoardWidth;
+	int BoardHeight;
+	Transform[,] Tiles;
 	#endregion // vars
 	
-	Transform FindRowContainer(int row)
+	public void Init(Transform tileContainer, MainLoop script)
 	{
-		Component[] rowContainerXForms = TileContainer.gameObject.GetComponentsInChildren<Transform>();
+		TileContainer = tileContainer;
+		mlScript = script;
 		
-		foreach (Transform t in rowContainerXForms)
+		BoardWidth = mlScript.BoardWidth;
+		BoardHeight = mlScript.BoardHeight;
+		
+		Tiles = new Transform[BoardHeight, BoardWidth];
+		
+		for (int row = 0; row < BoardHeight; row++)
 		{
-			if (t.gameObject != TileContainer.gameObject)
+			for (int column = 0; column < BoardWidth; column++)
 			{
-				if ((int)t.localPosition.y == row)
-				{
-					return t;
-				}
+				Tiles[row, column] = null;
 			}
 		}
-		
-		return TileContainer;
 	}
 	
 	public void AddTile(Transform tileInstance, Vector3 loc)
@@ -33,50 +37,43 @@ class LooseTileManager
 		int gridRow = 0;
 		mlScript.TranslateCoordtoGridCell(loc.x, loc.y, out gridColumn, out gridRow);
 		
-		Transform rowContainer = FindRowContainer(gridRow);
+		Tiles[gridRow, gridColumn] = tileInstance;
 
-		tileInstance.gameObject.transform.parent = rowContainer.gameObject.transform;
+		tileInstance.gameObject.transform.parent = TileContainer.gameObject.transform;
 		
 		mlScript.OccupyGridCell(gridColumn, gridRow);
 	}
 	
 	public void ClearRow(int row)
 	{
-		Transform rowContainer = FindRowContainer(row);
-		
-		Component[] tiles = rowContainer.gameObject.GetComponentsInChildren<Transform>();
-		
-		foreach (Transform t in tiles)
+		for (int column = 0; column < BoardWidth; column++)
 		{
-			if (t.gameObject != rowContainer.gameObject)
-			{
-				mlScript.DestroyTile(t);
-			}
+			mlScript.DestroyTile(Tiles[row, column]);
+			Tiles[row, column] = null;
 		}
 	}
 	
 	public void CompactTiles(int startGridRow)
 	{
-		// TODO -- compact all tiles down 1 row, starting at row above 'startGridRow'
+		// compact all tiles down 1 row, starting at row above 'startGridRow'
+		Vector3 downOne = new Vector3(0f, -1f, 0f);
 		
-		for (int row = startGridRow; row < (mlScript.BoardHeight - 2); row++)
+		for (int row = startGridRow; row < (mlScript.BoardHeight - 1); row++)
 		{
-			Transform targetRow = FindRowContainer(row);
-			Transform sourceRow = FindRowContainer(row + 1);
+			int targetRow = row;
+			int sourceRow = row + 1;
 			
-			Component[] sourceTiles = sourceRow.gameObject.GetComponentsInChildren<UnityEngine.Transform>();
 			
-			foreach (UnityEngine.Transform t in sourceTiles)
+			for (int column = 0; column < BoardWidth; column++)
 			{
-				if (t.gameObject != sourceRow.gameObject)
+				Tiles[targetRow, column] = Tiles[sourceRow, column];
+				Tiles[sourceRow, column] = null;
+				if (Tiles[targetRow, column] != null)
 				{
-					t.gameObject.transform.parent = targetRow.gameObject.transform;
-					
-					// TODO -- do I need to translate the tiles down by 1?
+					Tiles[targetRow, column].Translate(downOne);
 				}
 			}
 		}
-		
 	}
 	
 };
@@ -138,8 +135,7 @@ public class MainLoop : MonoBehaviour
 		
 		TileManager = new LooseTileManager();
 		
-		TileManager.TileContainer = TileContainer;
-		TileManager.mlScript = this;
+		TileManager.Init(TileContainer, this);
 	}
 	
 	#endregion // init
@@ -202,7 +198,17 @@ public class MainLoop : MonoBehaviour
 	
 	void CompactGrid(int startGridRow)
 	{
-		// TODO - compact all rows down by one, starting at startGridRow and working up
+		// move all rows above startGridRow down by one.
+		for (int row = startGridRow; row < (BoardHeight - 1); row++)
+		{
+			int targetRow = row;
+			int sourceRow = row + 1;
+			for (int column = 0; column < BoardWidth; column++)
+			{
+				mBoard[targetRow, column] = mBoard[sourceRow, column];
+				mBoard[sourceRow, column] = false;
+			}
+		}
 	}
 	
 	#endregion // grid utility
@@ -216,7 +222,7 @@ public class MainLoop : MonoBehaviour
 	
 	public void DestroyTile(Transform tileInstance)
 	{
-		Destroy(tileInstance);
+		Destroy(tileInstance.gameObject);
 	}
 	
 	int FindFullRows(bool[] fullRows)
@@ -397,7 +403,7 @@ public class MainLoop : MonoBehaviour
 		//	Automatic piece drops
 		//	Game modes - paused, main menu, playing
 		//	Game Over - Piece decomposed with any part on buffer?  Or all on buffer?  Back to pre-game start mode.
-		//	Clear complete lines
+		//	DONE - Clear complete lines
 		//	Update current drop speed based on # lines completed
 		//	DONE - Preview next piece to drop
 		//	DONE - Debounce key input
