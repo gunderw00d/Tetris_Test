@@ -11,52 +11,29 @@ public class Drop : MonoBehaviour
 	public Transform IndividualTile;
 	
 	public bool HoldInPlace;	// "gravity" doesn't affect this piece, leave it be.
+	public bool AtBottom;
 	
-	public GameObject MainLoopScriptObject;
+	public Grid GridScript;
+	public TileManager TileManagerScript;
 	#endregion // vars
 	
-	// Use this for initialization
 	void Start()
 	{
 		FrameCount = 0;
-	}
-	
-	// TODO - move into MainLoop.cs
-	bool SpotOpen(Vector3 worldLoc)
-	{
-		MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
-		
-		int gridColumn = 0;
-		int gridRow = 0;
-		mlScript.TranslateCoordtoGridCell(worldLoc.x, worldLoc.y, out gridColumn, out gridRow);
-		
-		if (mlScript.InGirdBuffer(gridColumn, gridRow))
-		{
-			return true;
-		}
-		if (!mlScript.InGridRange(gridColumn, gridRow))
-		{
-			return false;
-		}
-		if (mlScript.GridCellOccupied(gridColumn, gridRow))
-		{
-			return false;
-		}
-		
-		return true;
+		AtBottom = false;
 	}
 	
 	bool AllSpotsOpen(Vector3 offset)
 	{
-		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
+		Component[] tileXForms = gameObject.GetComponentsInChildren<Transform>();
 		
 		foreach (Transform t in tileXForms)
 		{
-			if (t.gameObject != this.gameObject)
+			if (t.gameObject != gameObject)
 			{
 				Vector3 newLoc = transform.position + t.localPosition + offset;
 				
-				if (!SpotOpen(newLoc))
+				if (!GridScript.SpotOpen(newLoc))
 				{
 					return false;
 				}
@@ -66,21 +43,18 @@ public class Drop : MonoBehaviour
 		return true;
 	}
 	
-	void DecomposePiece()
+	public void DecomposePiece()
 	{
-		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
-		MainLoop mlScript = MainLoopScriptObject.GetComponent<MainLoop>();
+		Component[] tileXForms = gameObject.GetComponentsInChildren<Transform>();
 		
 		foreach (Transform t in tileXForms)
 		{
-			if (t.gameObject != this.gameObject)
+			if (t.gameObject != gameObject)
 			{
 				Vector3 newLoc = transform.position + t.localPosition;
-				mlScript.CreateTile(IndividualTile, newLoc);
+				TileManagerScript.AddTile(IndividualTile, newLoc);
 			}
 		}
-		
-		mlScript.DestroyCurrentPiece();
 	}
 	
 	#region movement
@@ -96,7 +70,7 @@ public class Drop : MonoBehaviour
 		}
 		else
 		{
-			DecomposePiece();
+			AtBottom = true;
 		}
 	}
 	
@@ -142,17 +116,17 @@ public class Drop : MonoBehaviour
 	
 	public void RotatePiece(Vector3 offset)
 	{
-		Component[] tileXForms = this.gameObject.GetComponentsInChildren<Transform>();
+		Component[] tileXForms = gameObject.GetComponentsInChildren<Transform>();
 		
 		foreach (Transform t in tileXForms)
 		{
-			if (t.gameObject != this.gameObject)
+			if (t.gameObject != gameObject)
 			{
 				// swap x and y
 				Vector3 newLoc = new Vector3(t.localPosition.y * offset.x, t.localPosition.x * offset.y, t.localPosition.z * offset.z);
 				newLoc = transform.position + newLoc;
 				
-				if (!SpotOpen(newLoc))
+				if (!GridScript.SpotOpen(newLoc))
 				{
 					return;
 				}
@@ -164,7 +138,7 @@ public class Drop : MonoBehaviour
 		
 		foreach (Transform t in tileXForms)
 		{
-			if (t.gameObject != this.gameObject)
+			if (t.gameObject != gameObject)
 			{
 				Vector3 newLoc = new Vector3(t.localPosition.y * offset.x, t.localPosition.x * offset.y, t.localPosition.z * offset.z);
 				t.localPosition = newLoc;
@@ -173,7 +147,6 @@ public class Drop : MonoBehaviour
 	}
 	#endregion // movement
 	
-	// Update is called once per frame
 	void Update()
 	{
 		if (HoldInPlace)
@@ -181,14 +154,17 @@ public class Drop : MonoBehaviour
 			return;
 		}
 		
-		if (FrameCount <= DropOnFrame)
+		if (!AtBottom)
 		{
-			FrameCount += 1;
-		}
-		else
-		{
-			FrameCount = 0;
-			MovePieceDown();
+			if (FrameCount <= DropOnFrame)
+			{
+				FrameCount += 1;
+			}
+			else
+			{
+				FrameCount = 0;
+				MovePieceDown();
+			}
 		}
 	}
 }
