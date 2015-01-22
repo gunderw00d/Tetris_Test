@@ -87,8 +87,8 @@ public class MainLoop : MonoBehaviour
 		if (fullRowCount > 0)
 		{
 			RemoveFullRows(fullRows);
-			//ScoreFullRows(fullRowCount);
-			//HandleLevelUp(fullRowCount);
+			ScoreFullRows(fullRowCount);
+			HandleLevelUp(fullRowCount);
 		}
 	}
 	#endregion // clear rows
