@@ -24,11 +24,20 @@ public class MainLoop : MonoBehaviour
 
 	public delegate void dInputAction();
 	InputHandler InputHandlerScript;
+
+	enum Mode
+	{
+		StartScreen,
+		Playing,
+		Paused,
+		GameOver
+	};
 	
+	Mode GameMode;
+		
 	public bool DEBUG_DisableDrop = false;
 	public bool DEBUG_DisplayBuffer = false;
 	public bool DEBUG_CreatePiecesRandom = true;
-	
 	#endregion // vars
 
 	#region init
@@ -37,6 +46,13 @@ public class MainLoop : MonoBehaviour
 		Random.seed = (int)System.DateTime.Now.Ticks;
 		
 		InputHandlerScript = gameObject.GetComponent<InputHandler>();
+		
+		// TODO - callbacks, ChangeMode(), on various classes, to configure them.
+		//        EG: InputHandler - swaps out what inputs work.
+		//            MainLoop - halts new piece creation, etc.
+		//            Drop - pauses piece, halts fall while being removed, etc.
+		//            TileManager - wipe out board, if necessary.
+		GameMode = Mode.StartScreen;
 	}
 	#endregion // init
 	
