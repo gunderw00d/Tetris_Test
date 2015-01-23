@@ -17,6 +17,30 @@ public class Drop : MonoBehaviour
 	public TileManager TileManagerScript;
 	#endregion // vars
 	
+	
+	
+	// Drop - in mode:
+	//
+	//	StartScreen:
+	//				- Transition into - Mark piece as done.
+	//				- Update() - do nothing
+	//
+	//	Playing:
+	//				- Transition into - Do nothing - no instances should exist, so nothing to do.
+	//				- Update() - main loop runs as expected, looking for finished pieces to decompose and destroy.
+	//					TODO -- needs to automatically create pieces if CurrentFallingPiece == null.
+	//					TODO -- needs to detect GameOver state - piece being decomposed w/ parts in buffer.
+	//
+	//	Paused:
+	//				- Transition into - ... do nothing?
+	//				- Update() - do nothing?
+	//
+	//	GameOver:
+	//				- Transition into - stop main loop from doing anything.  (no new pieces should be created, so loop will do nothing)
+	//				- Update() - do nothing.
+	
+	
+	
 	void Start()
 	{
 		FrameCount = 0;

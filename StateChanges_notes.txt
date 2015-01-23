@@ -1,0 +1,34 @@
+StartGame
+	display blank background, no pieces waiting, score 0, lines 0, level 0
+
+	Can -> StartPlaying, Exit
+
+StartPlay
+	wipe board of loose tiles
+	wipe piece preview
+	assumes any current falling piece has been decomposed into loose tiles (and therefore cleaned up in step 1)
+
+	Can -> Playing, automatically
+
+Playing
+	pieces auto created
+	pieces fall
+	pieces decompose on settling
+	complete lines removed
+	line count, score, level go up
+
+	Can -> Paused, GameOver (auto ->, if GameOver conditions met)
+
+Paused
+	current falling piece doesn't move
+
+	Can -> Playing, GameOver, Exit
+
+GameOver
+	decompose current falling piece, if not null
+	display last piece preview
+	display loose tiles as they were before
+	display last score, lines, level
+
+	Can -> StartPlay, Exit
+	

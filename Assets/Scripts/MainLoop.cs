@@ -28,6 +28,7 @@ public class MainLoop : MonoBehaviour
 	enum Mode
 	{
 		StartScreen,
+		StartPlay,
 		Playing,
 		Paused,
 		GameOver
@@ -47,11 +48,6 @@ public class MainLoop : MonoBehaviour
 		
 		InputHandlerScript = gameObject.GetComponent<InputHandler>();
 		
-		// TODO - callbacks, ChangeMode(), on various classes, to configure them.
-		//        EG: InputHandler - swaps out what inputs work.
-		//            MainLoop - halts new piece creation, etc.
-		//            Drop - pauses piece, halts fall while being removed, etc.
-		//            TileManager - wipe out board, if necessary.
 		GameMode = Mode.StartScreen;
 	}
 	#endregion // init
@@ -219,11 +215,17 @@ public class MainLoop : MonoBehaviour
 		//	Game modes - paused, main menu, playing
 		//	Game Over - Piece decomposed with any part on buffer?  Or all on buffer?  Back to pre-game start mode.
 		//	DONE - Clear complete lines
-		//	Update current drop speed based on # lines completed
+		//	DONE - Update current drop speed based on # lines completed
 		//	DONE - Preview next piece to drop
 		//	DONE - Debounce key input
 		//	DONE - Rotate pieces
 		//	DONE - Disallow pieces hanging off top of board (IE: extend board edges up 3 or 4 more rows.
+		
+		// TODO:
+		//	Consider - swap current tile for previewed.
+		//				Can always do it?
+		//				Have to earn by getting Tetris(es)?
+		//				Where does piece swap to - current location, or top?  (current, seems most fair)
 		
 		
 		if (CurrentFallingPiece != null)
