@@ -8,11 +8,17 @@ public class TileManager : MonoBehaviour, IModeChanger
 	Transform[,] Tiles;
 #endregion // vars
 
-	public void AddTile(Transform tile, Vector3 loc)
+	public void AddTile(Transform tile, Vector3 loc, out int NumTilesInBuffer)
 	{
+		NumTilesInBuffer = 0;
 		int gridColumn = 0;
 		int gridRow = 0;
 		GridScript.TranslateCoordtoGridCell(loc.x, loc.y, out gridColumn, out gridRow);
+		
+		if (GridScript.InGirdBuffer(gridColumn, gridRow))
+		{
+			NumTilesInBuffer++;
+		}
 		
 		Transform tileInstance = Instantiate(tile, loc, Quaternion.identity) as Transform;
 		Tiles[gridRow, gridColumn] = tileInstance;
@@ -67,7 +73,7 @@ public class TileManager : MonoBehaviour, IModeChanger
 	{
 		if (newMode == MainLoop.Mode.StartPlay)
 		{
-			for (int i = 0; i < GridScript.BoardHeight; i++)
+			for (int i = 0; i < GridScript.BoardHeight + GridScript.BoardTopBufferHeight; i++)
 			{
 				WipeRow(i);
 			}
@@ -80,9 +86,9 @@ public class TileManager : MonoBehaviour, IModeChanger
 	{
 		GridScript = gameObject.GetComponent<Grid>();
 		
-		Tiles = new Transform[GridScript.BoardHeight, GridScript.BoardWidth];
+		Tiles = new Transform[GridScript.BoardHeight + GridScript.BoardTopBufferHeight, GridScript.BoardWidth];
 		
-		for (int row = 0; row < GridScript.BoardHeight; row++)
+		for (int row = 0; row < GridScript.BoardHeight + GridScript.BoardTopBufferHeight; row++)
 		{
 			for (int column = 0; column < GridScript.BoardWidth; column++)
 			{

@@ -67,18 +67,21 @@ public class Drop : MonoBehaviour, IModeChanger
 		return true;
 	}
 	
-	public void DecomposePiece()
+	public bool DecomposePiece()
 	{
 		Component[] tileXForms = gameObject.GetComponentsInChildren<Transform>();
+		int numTilesInBuffer = 0;
 		
 		foreach (Transform t in tileXForms)
 		{
 			if (t.gameObject != gameObject)
 			{
 				Vector3 newLoc = transform.position + t.localPosition;
-				TileManagerScript.AddTile(IndividualTile, newLoc);
+				TileManagerScript.AddTile(IndividualTile, newLoc, out numTilesInBuffer);
 			}
 		}
+		
+		return numTilesInBuffer > 0;
 	}
 	
 	#region movement

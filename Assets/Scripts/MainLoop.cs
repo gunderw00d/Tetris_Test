@@ -255,6 +255,14 @@ public class MainLoop : MonoBehaviour
 	{
 	}
 	
+	public void PausePressed()
+	{
+	}
+	
+	public void ResumePressed()
+	{
+	}
+	
 	#endregion menu input
 	
 	void ChangeMode(Mode newMode)
@@ -307,12 +315,19 @@ public class MainLoop : MonoBehaviour
 		Drop dropScript = CurrentFallingPiece.GetComponent<Drop>();
 		if (dropScript.AtBottom)
 		{
-			// TODO -- have DecomposePiece know if we've lost?
-			dropScript.DecomposePiece();
+			bool tilesInBuffer = dropScript.DecomposePiece();
 			
 			DestroyPiece(CurrentFallingPiece);
 			CurrentFallingPiece = null;
-			ClearCompleteLines();
+			
+			if (tilesInBuffer)
+			{
+				ChangeMode(Mode.GameOver);
+			}
+			else
+			{
+				ClearCompleteLines();
+			}
 		}
 	}
 	
