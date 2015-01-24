@@ -7,7 +7,7 @@ public class DebugViewOnly : MonoBehaviour
 	#region vars
 	public bool mVisible = false;
 	#endregion // vars
-
+		
 	void Start()
 	{
 		gameObject.SetActive(mVisible);

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Grid : MonoBehaviour
+public class Grid : MonoBehaviour, IModeChanger
 {
 	#region vars
 	public int BoardHeight = 20;
@@ -51,6 +51,12 @@ public class Grid : MonoBehaviour
 	
 	public void ClearGridRow(int gridRow)
 	{
+		WipeRow(gridRow);
+		CompactGrid(gridRow);
+	}
+	
+	void WipeRow(int gridRow)
+	{
 		if ((gridRow >= 0) && (gridRow < BoardHeight))
 		{
 			for (int column = 0; column < BoardWidth; column++)
@@ -58,8 +64,6 @@ public class Grid : MonoBehaviour
 				mBoard[gridRow, column] = false;
 			}
 		}
-		
-		CompactGrid(gridRow);
 	}
 	
 	void CompactGrid(int startGridRow)
@@ -121,6 +125,20 @@ public class Grid : MonoBehaviour
 		
 		return true;
 	}
+	
+	#region IModeChanger
+	public void ChangeMode(MainLoop.Mode newMode)
+	{
+		if (newMode == MainLoop.Mode.StartPlay)
+		{
+			for (int i = 0; i < BoardHeight; i++)
+			{
+				WipeRow(i);
+			}
+		}
+	}
+	
+	#endregion IModeChanger
 
 	void Start()
 	{

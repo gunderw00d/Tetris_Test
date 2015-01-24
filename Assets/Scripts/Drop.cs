@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Drop : MonoBehaviour
+public class Drop : MonoBehaviour, IModeChanger
 {
 	#region vars
 	public int DropOnFrame = 10;
@@ -170,6 +170,13 @@ public class Drop : MonoBehaviour
 		}
 	}
 	#endregion // movement
+	
+	#region IModeChanger
+	public void ChangeMode(MainLoop.Mode newMode)
+	{
+	}
+	
+	#endregion IModeChanger
 	
 	void Update()
 	{

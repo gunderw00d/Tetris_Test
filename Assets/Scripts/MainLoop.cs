@@ -2,6 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public interface IModeChanger
+{
+	void ChangeMode(MainLoop.Mode newMode);
+};
 
 public class MainLoop : MonoBehaviour
 {
@@ -25,16 +29,21 @@ public class MainLoop : MonoBehaviour
 	public delegate void dInputAction();
 	InputHandler InputHandlerScript;
 
-	enum Mode
+	public enum Mode
 	{
-		StartScreen,
-		StartPlay,
-		Playing,
-		Paused,
-		GameOver
+		StartScreen = 0,
+		StartPlay = 1,
+		Playing = 2,
+		Paused = 3,
+		GameOver = 4
 	};
 	
 	Mode GameMode;
+	
+	delegate void dGameModeFunc();
+	Dictionary<Mode, dGameModeFunc> GameModeFuncs;
+	
+	List<IModeChanger> ModeChangers;
 		
 	public bool DEBUG_DisableDrop = false;
 	public bool DEBUG_DisplayBuffer = false;
@@ -49,6 +58,21 @@ public class MainLoop : MonoBehaviour
 		InputHandlerScript = gameObject.GetComponent<InputHandler>();
 		
 		GameMode = Mode.StartScreen;
+		
+		GameModeFuncs = new Dictionary<Mode, dGameModeFunc>();
+		GameModeFuncs[Mode.StartScreen] = GameMode_StartScreen;
+		GameModeFuncs[Mode.StartPlay] = GameMode_StartPlay;
+		GameModeFuncs[Mode.Playing] = GameMode_Playing;
+		GameModeFuncs[Mode.Paused] = GameMode_Paused;
+		GameModeFuncs[Mode.GameOver] = GameMode_GameOver;
+		
+		TileManager tmScript = TileContainer.gameObject.GetComponent<TileManager>();
+		Grid gScript = TileContainer.gameObject.GetComponent<Grid>();
+		
+		ModeChangers = new List<IModeChanger>();
+		ModeChangers.Add(InputHandlerScript);
+		ModeChangers.Add(tmScript);
+		ModeChangers.Add(gScript);
 	}
 	#endregion // init
 	
@@ -106,11 +130,12 @@ public class MainLoop : MonoBehaviour
 	#endregion // clear rows
 	
 	#region piece management
-	void DestroyCurrentPiece()
+	void DestroyPiece(Transform piece)
 	{
-		Destroy(CurrentFallingPiece.gameObject);
-		CurrentFallingPiece = null;
-		InputHandlerScript.NoPieceFallingInput();
+		Drop dropScript = piece.gameObject.GetComponent<Drop>();
+		ModeChangers.Remove(dropScript);
+		
+		Destroy(piece.gameObject);
 	}
 	
 	void CreatePiece(int dropOnFrame, Transform piecePrefab)
@@ -122,6 +147,7 @@ public class MainLoop : MonoBehaviour
 		dropScript.TileManagerScript = TileContainer.GetComponent<TileManager>();
 		dropScript.DropOnFrame = dropOnFrame;
 		dropScript.HoldInPlace = true;
+		ModeChangers.Add(dropScript);
 		
 		if (NextPiecePreview != null)
 		{
@@ -130,8 +156,6 @@ public class MainLoop : MonoBehaviour
 			
 			Drop cfpDropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>(); 
 			cfpDropScript.HoldInPlace = DEBUG_DisableDrop;
-
-			InputHandlerScript.PieceFallingInput();
 		}
 		NextPiecePreview = newPiece;
 	}
@@ -155,7 +179,7 @@ public class MainLoop : MonoBehaviour
 		PieceIndex++;
 	}
 	
-	public void CreateNextPiece()
+	void CreateNextPiece()
 	{
 		if (DEBUG_CreatePiecesRandom)
 		{
@@ -168,7 +192,7 @@ public class MainLoop : MonoBehaviour
 	}
 	#endregion // piece management
 	
-	#region input
+	#region movement input
 		
 	public void DoNothing()
 	{
@@ -176,44 +200,142 @@ public class MainLoop : MonoBehaviour
 	
 	public void MovePieceLeft()
 	{		
-		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
-		dropScript.MovePieceLeft();
+		if (CurrentFallingPiece != null)
+		{
+			Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+			dropScript.MovePieceLeft();
+		}
 	}
 	
 	public void MovePieceRight()
 	{
-		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
-		dropScript.MovePieceRight();
+		if (CurrentFallingPiece != null)
+		{
+			Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+			dropScript.MovePieceRight();
+		}
 	}
 	
 	public void RotatePieceCW()
 	{
-		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
-		dropScript.RotatePieceCW();
+		if (CurrentFallingPiece != null)
+		{
+			Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+			dropScript.RotatePieceCW();
+		}
 	}
 	
 	public void RotatePieceCCW()
 	{
-		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
-		dropScript.RotatePieceCCW();
+		if (CurrentFallingPiece != null)
+		{
+			Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+			dropScript.RotatePieceCCW();
+		}
 	}
 	
 	public void MovePieceDown()
 	{
-		Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
-		dropScript.MovePieceDown();
+		if (CurrentFallingPiece != null)
+		{
+			Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+			dropScript.MovePieceDown();
+		}
+	}
+	#endregion movement input
+	
+	#region menu input
+	public void StartPressed()
+	{
+		// From StartScreen, or GameOver, Start was pressed
+		ChangeMode(Mode.StartPlay);
 	}
 	
-	#endregion // input
+	public void ExitPressed()
+	{
+	}
+	
+	#endregion menu input
+	
+	void ChangeMode(Mode newMode)
+	{
+		GameMode = newMode;
+		
+		// TODO -- need to prevent mode change if !AllChangersReady()?
+		
+		foreach (IModeChanger mc in ModeChangers)
+		{
+			mc.ChangeMode(newMode);
+		}
+	}
+		
+	#region game mode funcs
+	void GameMode_StartScreen()
+	{
+	}
+	
+	void GameMode_StartPlay()
+	{
+		if (CurrentFallingPiece != null)
+		{
+			DestroyPiece(CurrentFallingPiece);
+			CurrentFallingPiece = null;
+		}
+		
+		if (NextPiecePreview != null)
+		{
+			DestroyPiece(NextPiecePreview);
+			NextPiecePreview = null;
+		}
+		
+		ChangeMode(Mode.Playing);
+	}
+	
+	void GameMode_Playing()
+	{
+		// TODO:
+		//	Consider - swap current tile for previewed.
+		//				Can always do it?
+		//				Have to earn by getting Tetris(es)?
+		//				Where does piece swap to - current location, or top?  (current, seems most fair)
+		
+		while (CurrentFallingPiece == null)
+		{
+			CreateNextPiece();
+		}
+		
+		Drop dropScript = CurrentFallingPiece.GetComponent<Drop>();
+		if (dropScript.AtBottom)
+		{
+			// TODO -- have DecomposePiece know if we've lost?
+			dropScript.DecomposePiece();
+			
+			DestroyPiece(CurrentFallingPiece);
+			CurrentFallingPiece = null;
+			ClearCompleteLines();
+		}
+	}
+	
+	void GameMode_Paused()
+	{
+		// TODO -- tell current falling piece to stop moving
+	}
+	
+	void GameMode_GameOver()
+	{
+		// TODO -- should be decomposed... and no new falling piece, so... do nothing?
+	}
+	
+	#endregion game mode funcs
 	
 	// Update is called once per frame
 	void Update()
 	{
 		// TODO list:
 		//
-		//	Automatic piece drops
-		//	Game modes - paused, main menu, playing
-		//	Game Over - Piece decomposed with any part on buffer?  Or all on buffer?  Back to pre-game start mode.
+		//	DONE - Automatic piece drops
+		//	IN PROGRESS - Game modes - paused, main menu, playing
+		//	IN PROGRESS - Game Over - Piece decomposed with any part on buffer?  Or all on buffer?  Back to pre-game start mode.
 		//	DONE - Clear complete lines
 		//	DONE - Update current drop speed based on # lines completed
 		//	DONE - Preview next piece to drop
@@ -221,23 +343,6 @@ public class MainLoop : MonoBehaviour
 		//	DONE - Rotate pieces
 		//	DONE - Disallow pieces hanging off top of board (IE: extend board edges up 3 or 4 more rows.
 		
-		// TODO:
-		//	Consider - swap current tile for previewed.
-		//				Can always do it?
-		//				Have to earn by getting Tetris(es)?
-		//				Where does piece swap to - current location, or top?  (current, seems most fair)
-		
-		
-		if (CurrentFallingPiece != null)
-		{
-			Drop dropScript = CurrentFallingPiece.GetComponent<Drop>();
-			if (dropScript.AtBottom)
-			{
-				dropScript.DecomposePiece();
-				DestroyCurrentPiece();
-				ClearCompleteLines();
-			}
-		}
-		
+		GameModeFuncs[GameMode]();
 	}
 }

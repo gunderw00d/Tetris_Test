@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TileManager : MonoBehaviour
+public class TileManager : MonoBehaviour, IModeChanger
 {
 #region vars
 	Grid GridScript;
@@ -24,13 +24,20 @@ public class TileManager : MonoBehaviour
 	
 	public void ClearRow(int row)
 	{
+		WipeRow(row);
+		CompactTiles(row);
+	}
+	
+	void WipeRow(int row)
+	{
 		for (int column = 0; column < GridScript.BoardWidth; column++)
 		{
-			Destroy(Tiles[row, column].gameObject);
-			Tiles[row, column] = null;
+			if (Tiles[row, column] != null)
+			{
+				Destroy(Tiles[row, column].gameObject);
+				Tiles[row, column] = null;
+			}
 		}
-		
-		CompactTiles(row);
 	}
 	
 	void CompactTiles(int startGridRow)
@@ -54,7 +61,21 @@ public class TileManager : MonoBehaviour
 			}
 		}
 	}
-
+	
+	#region IModeChanger
+	public void ChangeMode(MainLoop.Mode newMode)
+	{
+		if (newMode == MainLoop.Mode.StartPlay)
+		{
+			for (int i = 0; i < GridScript.BoardHeight; i++)
+			{
+				WipeRow(i);
+			}
+		}
+	}
+	
+	#endregion IModeChanger
+	
 	void Start()
 	{
 		GridScript = gameObject.GetComponent<Grid>();

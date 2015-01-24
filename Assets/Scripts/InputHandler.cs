@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class InputHandler : MonoBehaviour
+public class InputHandler : MonoBehaviour, IModeChanger
 {
 	#region vars	
 	public MainLoop MainLoopScript;
@@ -22,91 +22,36 @@ public class InputHandler : MonoBehaviour
 	};
 	
 	InputData mDoNothing;
-	
-	enum ActiveMapType
-	{
-		Playing = 0,
-		NoPiece = 1
-	};
-	
+		
 	Dictionary<KeyCode, InputData>[] InputMaps;
 	
-	ActiveMapType ActiveMap;
+	MainLoop.Mode ActiveMap;
+	int NumModes;
 	
 	public float DebounceInterval = 0.5f;
+	
+	KeyCode[] Codes;
 	#endregion // vars
 	
-	
-	void Start ()
+	#region IModeChanger
+	public void ChangeMode(MainLoop.Mode newMode)
 	{
-		MainLoopScript = gameObject.GetComponent<MainLoop>();
-		
-		mDoNothing = new InputData(MainLoopScript.DoNothing, 0);
-		
-		InputMaps = new Dictionary<KeyCode, InputData>[2];
-		InputMaps[(int)ActiveMapType.Playing] = new Dictionary<KeyCode, InputData>();
-		InputMaps[(int)ActiveMapType.NoPiece] = new Dictionary<KeyCode, InputData>();
-		
-		InputMaps[(int)ActiveMapType.Playing][KeyCode.Space] = new InputData(MainLoopScript.MovePieceDown, DebounceInterval);
-		InputMaps[(int)ActiveMapType.Playing][KeyCode.LeftArrow] = new InputData(MainLoopScript.MovePieceLeft, DebounceInterval);
-		InputMaps[(int)ActiveMapType.Playing][KeyCode.RightArrow] = new InputData(MainLoopScript.MovePieceRight, DebounceInterval);
-		InputMaps[(int)ActiveMapType.Playing][KeyCode.UpArrow] = new InputData(MainLoopScript.RotatePieceCW, DebounceInterval);
-		InputMaps[(int)ActiveMapType.Playing][KeyCode.DownArrow] = new InputData(MainLoopScript.RotatePieceCCW, DebounceInterval);
-		InputMaps[(int)ActiveMapType.Playing][KeyCode.None] = mDoNothing;
-		
-		// TODO -- DoNothing
-		InputMaps[(int)ActiveMapType.NoPiece][KeyCode.Space] = new InputData(MainLoopScript.CreateNextPiece, DebounceInterval);
-		InputMaps[(int)ActiveMapType.NoPiece][KeyCode.LeftArrow] = mDoNothing;
-		InputMaps[(int)ActiveMapType.NoPiece][KeyCode.RightArrow] = mDoNothing;
-		InputMaps[(int)ActiveMapType.NoPiece][KeyCode.UpArrow] = mDoNothing;
-		InputMaps[(int)ActiveMapType.NoPiece][KeyCode.DownArrow] = mDoNothing;
-		InputMaps[(int)ActiveMapType.NoPiece][KeyCode.None] = mDoNothing;
-		
-		ActiveMap = ActiveMapType.NoPiece;
+		ActiveMap = newMode;
 	}
 	
-	void Update ()
-	{
-		HandleInput();
-	}
-	
-	public void PieceFallingInput()
-	{
-		ActiveMap = ActiveMapType.Playing;
-	}
-	
-	public void NoPieceFallingInput()
-	{
-		ActiveMap = ActiveMapType.NoPiece;
-	}
+	#endregion IModeChanger
 	
 	KeyCode CheckForInput()
 	{
-		// TODO -- is there really no better way to do this?  Can I not just get keyboard events directly?
-		if (Input.GetKey(KeyCode.Space))
+		foreach (KeyCode code in Codes)
 		{
-			return KeyCode.Space;
+			if (Input.GetKey(code))
+			{
+				return code;
+			}
 		}
-		else if (Input.GetKey(KeyCode.LeftArrow))
-		{
-			return KeyCode.LeftArrow;
-		}
-		else if (Input.GetKey(KeyCode.RightArrow))
-		{
-			return KeyCode.RightArrow;
-		}
-		else if (Input.GetKey(KeyCode.UpArrow))
-		{
-			return KeyCode.UpArrow;
-		}
-		else if (Input.GetKey(KeyCode.DownArrow))
-		{
-			return KeyCode.DownArrow;
-		}
-		else
-		{
-			return KeyCode.None;
-		}
+		
+		return KeyCode.None;
 	}
 	
 	void HandleInput()
@@ -122,5 +67,47 @@ public class InputHandler : MonoBehaviour
 			}
 		}
 	}
+	
+	void Start ()
+	{
+		MainLoopScript = gameObject.GetComponent<MainLoop>();
+		
+		Codes = new KeyCode[] {KeyCode.Space, KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow};
+		
+		NumModes = System.Enum.GetNames(typeof(MainLoop.Mode)).Length;
+		InputMaps = new Dictionary<KeyCode, InputData>[NumModes];
+		mDoNothing = new InputData(MainLoopScript.DoNothing, 0);
+		
+		for (int i = 0; i < NumModes; i++)
+		{
+			InputMaps[i] = new Dictionary<KeyCode, InputData>();
+			
+			foreach (KeyCode code in Codes)
+			{
+				InputMaps[i][code] = mDoNothing;
+			}
+			InputMaps[i][KeyCode.None] = mDoNothing;
+		}
+		
+		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.Space] = new InputData(MainLoopScript.MovePieceDown, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.LeftArrow] = new InputData(MainLoopScript.MovePieceLeft, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.RightArrow] = new InputData(MainLoopScript.MovePieceRight, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.UpArrow] = new InputData(MainLoopScript.RotatePieceCW, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.DownArrow] = new InputData(MainLoopScript.RotatePieceCCW, DebounceInterval);
+		// TODO -- ESC to pause?
+		
+		// TODO -- in pause, space to resume?
+		
+		InputMaps[(int)MainLoop.Mode.StartScreen][KeyCode.Space] = new InputData(MainLoopScript.StartPressed, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.GameOver][KeyCode.Space] = new InputData(MainLoopScript.StartPressed, DebounceInterval);
+		
+		ActiveMap = MainLoop.Mode.StartScreen;
+	}
+	
+	void Update ()
+	{
+		HandleInput();
+	}
+	
 	
 }
