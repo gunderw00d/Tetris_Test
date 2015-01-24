@@ -348,15 +348,12 @@ public class MainLoop : MonoBehaviour
 	{
 		// TODO list:
 		//
-		//	DONE - Automatic piece drops
 		//	IN PROGRESS - Game modes - paused, main menu, playing
-		//	IN PROGRESS - Game Over - Piece decomposed with any part on buffer?  Or all on buffer?  Back to pre-game start mode.
-		//	DONE - Clear complete lines
-		//	DONE - Update current drop speed based on # lines completed
-		//	DONE - Preview next piece to drop
-		//	DONE - Debounce key input
-		//	DONE - Rotate pieces
-		//	DONE - Disallow pieces hanging off top of board (IE: extend board edges up 3 or 4 more rows.
+		//					TODO - Pause, Exit.
+		//	Menus!
+		//	Display Score, lines, level.
+		//	Sound.
+		//	Swap preview piece.
 		
 		GameModeFuncs[GameMode]();
 	}
