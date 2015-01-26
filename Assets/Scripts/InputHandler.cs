@@ -28,7 +28,7 @@ public class InputHandler : MonoBehaviour, IModeChanger
 	MainLoop.Mode ActiveMap;
 	int NumModes;
 	
-	public float DebounceInterval = 0.5f;
+	public float DebounceInterval = 0.175f;
 	
 	KeyCode[] Codes;
 	#endregion // vars
@@ -90,16 +90,23 @@ public class InputHandler : MonoBehaviour, IModeChanger
 		}
 		
 		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.Space] = new InputData(MainLoopScript.MovePieceDown, DebounceInterval);
-		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.LeftArrow] = new InputData(MainLoopScript.MovePieceLeft, DebounceInterval);
+		//InputMaps[(int)MainLoop.Mode.Playing][KeyCode.LeftArrow] = new InputData(MainLoopScript.MovePieceLeft, DebounceInterval);
 		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.RightArrow] = new InputData(MainLoopScript.MovePieceRight, DebounceInterval);
 		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.UpArrow] = new InputData(MainLoopScript.RotatePieceCW, DebounceInterval);
 		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.DownArrow] = new InputData(MainLoopScript.RotatePieceCCW, DebounceInterval);
-		// TODO -- ESC to pause?
+		//InputMaps[(int)MainLoop.Mode.Playing][KeyCode.Escape] = new InputData(MainLoopScript.PausePressed, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.LeftArrow] = new InputData(MainLoopScript.PausePressed, DebounceInterval);
 		
-		// TODO -- in pause, space to resume?
+		// TODO -- why does escape not work?  'Q' as well?
+		
+		//InputMaps[(int)MainLoop.Mode.Paused][KeyCode.Escape] = new InputData(MainLoopScript.ResumePressed, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.Paused][KeyCode.LeftArrow] = new InputData(MainLoopScript.ResumePressed, DebounceInterval);
 		
 		InputMaps[(int)MainLoop.Mode.StartScreen][KeyCode.Space] = new InputData(MainLoopScript.StartPressed, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.StartScreen][KeyCode.Q] = new InputData(MainLoopScript.ExitPressed, DebounceInterval);
+		
 		InputMaps[(int)MainLoop.Mode.GameOver][KeyCode.Space] = new InputData(MainLoopScript.StartPressed, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.GameOver][KeyCode.Q] = new InputData(MainLoopScript.ExitPressed, DebounceInterval);
 		
 		ActiveMap = MainLoop.Mode.StartScreen;
 	}

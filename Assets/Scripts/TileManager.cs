@@ -78,6 +78,16 @@ public class TileManager : MonoBehaviour, IModeChanger
 				WipeRow(i);
 			}
 		}
+		else if (newMode == MainLoop.Mode.Paused)
+		{
+			// TODO -- hide all tiles.  gameObject.SetActive(false);  ?
+			gameObject.SetActive(false);
+		}
+		else if (newMode == MainLoop.Mode.Playing)
+		{
+			// TODO -- unhide tiles.  gameObject.SetActive(true);  ?
+			gameObject.SetActive(true);
+		}
 	}
 	
 	#endregion IModeChanger

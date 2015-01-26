@@ -253,14 +253,17 @@ public class MainLoop : MonoBehaviour
 	
 	public void ExitPressed()
 	{
+		// TODO -- quit.
 	}
 	
 	public void PausePressed()
 	{
+		ChangeMode(Mode.Paused);
 	}
 	
 	public void ResumePressed()
 	{
+		ChangeMode(Mode.Playing);
 	}
 	
 	#endregion menu input

@@ -10,41 +10,20 @@ public class Drop : MonoBehaviour, IModeChanger
 	public float BottomYValue = 2;
 	public Transform IndividualTile;
 	
+	bool Active;
 	public bool HoldInPlace;	// "gravity" doesn't affect this piece, leave it be.
 	public bool AtBottom;
 	
 	public Grid GridScript;
 	public TileManager TileManagerScript;
 	#endregion // vars
-	
-	
-	
-	// Drop - in mode:
-	//
-	//	StartScreen:
-	//				- Transition into - Mark piece as done.
-	//				- Update() - do nothing
-	//
-	//	Playing:
-	//				- Transition into - Do nothing - no instances should exist, so nothing to do.
-	//				- Update() - main loop runs as expected, looking for finished pieces to decompose and destroy.
-	//					TODO -- needs to automatically create pieces if CurrentFallingPiece == null.
-	//					TODO -- needs to detect GameOver state - piece being decomposed w/ parts in buffer.
-	//
-	//	Paused:
-	//				- Transition into - ... do nothing?
-	//				- Update() - do nothing?
-	//
-	//	GameOver:
-	//				- Transition into - stop main loop from doing anything.  (no new pieces should be created, so loop will do nothing)
-	//				- Update() - do nothing.
-	
-	
-	
+
+		
 	void Start()
 	{
 		FrameCount = 0;
 		AtBottom = false;
+		Active = true;
 	}
 	
 	bool AllSpotsOpen(Vector3 offset)
@@ -177,27 +156,38 @@ public class Drop : MonoBehaviour, IModeChanger
 	#region IModeChanger
 	public void ChangeMode(MainLoop.Mode newMode)
 	{
+		if (newMode == MainLoop.Mode.Paused)
+		{
+			Active = false;
+		}
+		else if (newMode == MainLoop.Mode.Playing)
+		{
+			Active = true;
+		}
 	}
 	
 	#endregion IModeChanger
 	
 	void Update()
 	{
-		if (HoldInPlace)
+		if (Active)
 		{
-			return;
-		}
-		
-		if (!AtBottom)
-		{
-			if (FrameCount <= DropOnFrame)
+			if (HoldInPlace)
 			{
-				FrameCount += 1;
+				return;
 			}
-			else
+			
+			if (!AtBottom)
 			{
-				FrameCount = 0;
-				MovePieceDown();
+				if (FrameCount <= DropOnFrame)
+				{
+					FrameCount += 1;
+				}
+				else
+				{
+					FrameCount = 0;
+					MovePieceDown();
+				}
 			}
 		}
 	}
