@@ -351,12 +351,10 @@ public class MainLoop : MonoBehaviour
 	
 	void GameMode_Paused()
 	{
-		// TODO -- tell current falling piece to stop moving
 	}
 	
 	void GameMode_GameOver()
 	{
-		// TODO -- should be decomposed... and no new falling piece, so... do nothing?
 	}
 	
 	#endregion game mode funcs
@@ -366,8 +364,7 @@ public class MainLoop : MonoBehaviour
 	{
 		// TODO list:
 		//
-		//	IN PROGRESS - Game modes - paused, main menu, playing
-		//					TODO - Pause, Exit.
+		//	Game Modes - Exit.
 		//	Menus!
 		//	Display Score, lines, level.
 		//	Sound.
