@@ -258,11 +258,27 @@ public class MainLoop : MonoBehaviour
 	public void PausePressed(float axisValue)
 	{
 		ChangeMode(Mode.Paused);
+		if (CurrentFallingPiece != null)
+		{
+			CurrentFallingPiece.gameObject.SetActive(false);
+		}
+		if (NextPiecePreview != null)
+		{
+			NextPiecePreview.gameObject.SetActive(false);
+		}
 	}
 	
 	public void ResumePressed(float axisValue)
 	{
 		ChangeMode(Mode.Playing);
+		if (CurrentFallingPiece != null)
+		{
+			CurrentFallingPiece.gameObject.SetActive(true);
+		}
+		if (NextPiecePreview != null)
+		{
+			NextPiecePreview.gameObject.SetActive(true);
+		}
 	}
 	
 	#endregion menu input
