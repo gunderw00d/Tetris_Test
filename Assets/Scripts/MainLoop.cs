@@ -26,7 +26,7 @@ public class MainLoop : MonoBehaviour
 	public Transform TileContainer;
 	public Transform Background;
 
-	public delegate void dInputAction();
+	public delegate void dInputAction(float axisValue);
 	InputHandler InputHandlerScript;
 
 	public enum Mode
@@ -194,47 +194,46 @@ public class MainLoop : MonoBehaviour
 	
 	#region movement input
 		
-	public void DoNothing()
+	public void DoNothing(float axisValue)
 	{
 	}
 	
-	public void MovePieceLeft()
-	{		
+	public void MovePiece(float axisValue)
+	{
+		
 		if (CurrentFallingPiece != null)
 		{
-			Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
-			dropScript.MovePieceLeft();
+			if (axisValue > 0f)
+			{
+				Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+				dropScript.MovePieceRight();
+			}
+			else	// < 0f
+			{
+				Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+				dropScript.MovePieceLeft();
+			}
 		}
 	}
 	
-	public void MovePieceRight()
+	public void RotatePiece(float axisValue)
 	{
 		if (CurrentFallingPiece != null)
 		{
-			Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
-			dropScript.MovePieceRight();
+			if (axisValue > 0f)
+			{
+				Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+				dropScript.RotatePieceCW();
+			}
+			else	// < 0f
+			{
+				Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
+				dropScript.RotatePieceCCW();
+			}
 		}
 	}
-	
-	public void RotatePieceCW()
-	{
-		if (CurrentFallingPiece != null)
-		{
-			Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
-			dropScript.RotatePieceCW();
-		}
-	}
-	
-	public void RotatePieceCCW()
-	{
-		if (CurrentFallingPiece != null)
-		{
-			Drop dropScript = CurrentFallingPiece.gameObject.GetComponent<Drop>();
-			dropScript.RotatePieceCCW();
-		}
-	}
-	
-	public void MovePieceDown()
+		
+	public void MovePieceDown(float axisValue)
 	{
 		if (CurrentFallingPiece != null)
 		{
@@ -245,23 +244,23 @@ public class MainLoop : MonoBehaviour
 	#endregion movement input
 	
 	#region menu input
-	public void StartPressed()
+	public void StartPressed(float axisValue)
 	{
 		// From StartScreen, or GameOver, Start was pressed
 		ChangeMode(Mode.StartPlay);
 	}
 	
-	public void ExitPressed()
+	public void ExitPressed(float axisValue)
 	{
 		// TODO -- quit.
 	}
 	
-	public void PausePressed()
+	public void PausePressed(float axisValue)
 	{
 		ChangeMode(Mode.Paused);
 	}
 	
-	public void ResumePressed()
+	public void ResumePressed(float axisValue)
 	{
 		ChangeMode(Mode.Playing);
 	}

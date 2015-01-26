@@ -23,14 +23,19 @@ public class InputHandler : MonoBehaviour, IModeChanger
 	
 	InputData mDoNothing;
 		
-	Dictionary<KeyCode, InputData>[] InputMaps;
+	Dictionary<string, InputData>[] InputMaps;
 	
 	MainLoop.Mode ActiveMap;
 	int NumModes;
 	
 	public float DebounceInterval = 0.175f;
 	
-	KeyCode[] Codes;
+	string[] AxisNames;
+	string kHorizontal = "Horizontal";
+	string kRotate = "Rotate";
+	string kDrop = "Drop";
+	string kSubmit = "Submit";
+	string kCancel = "Cancel";
 	#endregion // vars
 	
 	#region IModeChanger
@@ -41,29 +46,36 @@ public class InputHandler : MonoBehaviour, IModeChanger
 	
 	#endregion IModeChanger
 	
-	KeyCode CheckForInput()
+	bool CheckForInput(out string axisName, out float value)
 	{
-		foreach (KeyCode code in Codes)
+		foreach (string axis in AxisNames)
 		{
-			if (Input.GetKey(code))
+			float v = Input.GetAxis(axis);
+			if (v != 0f)
 			{
-				return code;
+				axisName = axis;
+				value = v;
+				return true;
 			}
 		}
 		
-		return KeyCode.None;
+		axisName = "";
+		value = 0f;
+		return false;
 	}
 	
 	void HandleInput()
 	{
-		KeyCode inputType = CheckForInput();
-		if (InputMaps[(int)ActiveMap].ContainsKey(inputType))
+		string axisName;
+		float value;
+		
+		if (CheckForInput(out axisName, out value))
 		{
-			float debounceDelta = Time.time - InputMaps[(int)ActiveMap][inputType].mLastPressed;
-			if (debounceDelta > InputMaps[(int)ActiveMap][inputType].mDebounceInterval)
+			float debounceDelta = Time.time - InputMaps[(int)ActiveMap][axisName].mLastPressed;
+			if (debounceDelta > InputMaps[(int)ActiveMap][axisName].mDebounceInterval)
 			{
-				InputMaps[(int)ActiveMap][inputType].mActionFunc();
-				InputMaps[(int)ActiveMap][inputType].mLastPressed = Time.time;
+				InputMaps[(int)ActiveMap][axisName].mActionFunc(value);
+				InputMaps[(int)ActiveMap][axisName].mLastPressed = Time.time;
 			}
 		}
 	}
@@ -71,42 +83,40 @@ public class InputHandler : MonoBehaviour, IModeChanger
 	void Start ()
 	{
 		MainLoopScript = gameObject.GetComponent<MainLoop>();
-		
-		Codes = new KeyCode[] {KeyCode.Space, KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow};
+		mDoNothing = new InputData(MainLoopScript.DoNothing, 0);
 		
 		NumModes = System.Enum.GetNames(typeof(MainLoop.Mode)).Length;
-		InputMaps = new Dictionary<KeyCode, InputData>[NumModes];
-		mDoNothing = new InputData(MainLoopScript.DoNothing, 0);
+		InputMaps = new Dictionary<string, InputData>[NumModes];
+		
+		AxisNames = new string[] {kHorizontal, kRotate, kDrop, kSubmit, kCancel };
 		
 		for (int i = 0; i < NumModes; i++)
 		{
-			InputMaps[i] = new Dictionary<KeyCode, InputData>();
+			InputMaps[i] = new Dictionary<string, InputData>();
 			
-			foreach (KeyCode code in Codes)
+			foreach (string axis in AxisNames)
 			{
-				InputMaps[i][code] = mDoNothing;
+				InputMaps[i][axis] = mDoNothing;
 			}
-			InputMaps[i][KeyCode.None] = mDoNothing;
 		}
 		
-		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.Space] = new InputData(MainLoopScript.MovePieceDown, DebounceInterval);
-		//InputMaps[(int)MainLoop.Mode.Playing][KeyCode.LeftArrow] = new InputData(MainLoopScript.MovePieceLeft, DebounceInterval);
-		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.RightArrow] = new InputData(MainLoopScript.MovePieceRight, DebounceInterval);
-		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.UpArrow] = new InputData(MainLoopScript.RotatePieceCW, DebounceInterval);
-		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.DownArrow] = new InputData(MainLoopScript.RotatePieceCCW, DebounceInterval);
-		//InputMaps[(int)MainLoop.Mode.Playing][KeyCode.Escape] = new InputData(MainLoopScript.PausePressed, DebounceInterval);
-		InputMaps[(int)MainLoop.Mode.Playing][KeyCode.LeftArrow] = new InputData(MainLoopScript.PausePressed, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.Playing][kDrop] = new InputData(MainLoopScript.MovePieceDown, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.Playing][kHorizontal] = new InputData(MainLoopScript.MovePiece, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.Playing][kRotate] = new InputData(MainLoopScript.RotatePiece, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.Playing][kCancel] = new InputData(MainLoopScript.PausePressed, DebounceInterval);
 		
-		// TODO -- why does escape not work?  'Q' as well?
 		
-		//InputMaps[(int)MainLoop.Mode.Paused][KeyCode.Escape] = new InputData(MainLoopScript.ResumePressed, DebounceInterval);
-		InputMaps[(int)MainLoop.Mode.Paused][KeyCode.LeftArrow] = new InputData(MainLoopScript.ResumePressed, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.Paused][kSubmit] = new InputData(MainLoopScript.ResumePressed, DebounceInterval);				
+		InputMaps[(int)MainLoop.Mode.Paused][kCancel] = new InputData(MainLoopScript.ResumePressed, DebounceInterval);
 		
-		InputMaps[(int)MainLoop.Mode.StartScreen][KeyCode.Space] = new InputData(MainLoopScript.StartPressed, DebounceInterval);
-		InputMaps[(int)MainLoop.Mode.StartScreen][KeyCode.Q] = new InputData(MainLoopScript.ExitPressed, DebounceInterval);
 		
-		InputMaps[(int)MainLoop.Mode.GameOver][KeyCode.Space] = new InputData(MainLoopScript.StartPressed, DebounceInterval);
-		InputMaps[(int)MainLoop.Mode.GameOver][KeyCode.Q] = new InputData(MainLoopScript.ExitPressed, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.StartScreen][kSubmit] = new InputData(MainLoopScript.StartPressed, DebounceInterval);
+		//InputMaps[(int)MainLoop.Mode.StartScreen]["Cancel"] = new InputData(MainLoopScript.ExitPressed, DebounceInterval);
+		
+		
+		
+		InputMaps[(int)MainLoop.Mode.GameOver][kSubmit] = new InputData(MainLoopScript.StartPressed, DebounceInterval);
+		//InputMaps[(int)MainLoop.Mode.GameOver]["Cancel"] = new InputData(MainLoopScript.ExitPressed, DebounceInterval);
 		
 		ActiveMap = MainLoop.Mode.StartScreen;
 	}
