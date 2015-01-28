@@ -25,6 +25,9 @@ public class MainLoop : MonoBehaviour
 	public Transform StartLocation;
 	public Transform TileContainer;
 	public Transform Background;
+	
+	public GameObject PauseMenu;
+	public GameObject InfoPanel;
 
 	public delegate void dInputAction(float axisValue);
 	InputHandler InputHandlerScript;
@@ -73,6 +76,8 @@ public class MainLoop : MonoBehaviour
 		ModeChangers.Add(InputHandlerScript);
 		ModeChangers.Add(tmScript);
 		ModeChangers.Add(gScript);
+		
+		PauseMenu.SetActive(false);
 	}
 	#endregion // init
 	
@@ -266,6 +271,8 @@ public class MainLoop : MonoBehaviour
 		{
 			NextPiecePreview.gameObject.SetActive(false);
 		}
+		
+		PauseMenu.SetActive(true);
 	}
 	
 	public void ResumePressed(float axisValue)
@@ -279,6 +286,7 @@ public class MainLoop : MonoBehaviour
 		{
 			NextPiecePreview.gameObject.SetActive(true);
 		}
+		PauseMenu.SetActive(false);
 	}
 	
 	#endregion menu input
