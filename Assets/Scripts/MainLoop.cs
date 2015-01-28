@@ -113,7 +113,7 @@ public class MainLoop : MonoBehaviour
 	}
 	#endregion init
 
-	#region foo
+	#region GameVar stuff
 	void SetGameVar(string varName, int value)
 	{
 		if (GameVars.ContainsKey(varName))
@@ -140,7 +140,15 @@ public class MainLoop : MonoBehaviour
 
 		return exists;
 	}
-	#endregion foo	
+	
+	public void RegisterWatcher(string varName, dGameVarWatcherFunc watcherFunc)
+	{
+		if (GameVars.ContainsKey(varName))
+		{
+			GameVars[varName].Watchers.Add(watcherFunc);
+		}
+	}
+	#endregion GameVar stuff
 	
 	#region clear rows	
 	void RemoveFullRows(bool[] fullRows)
@@ -200,7 +208,7 @@ public class MainLoop : MonoBehaviour
 			HandleLevelUp(fullRowCount);
 		}
 	}
-	#endregion // clear rows
+	#endregion clear rows
 	
 	#region piece management
 	void DestroyPiece(Transform piece)
@@ -395,6 +403,10 @@ public class MainLoop : MonoBehaviour
 		}
 		
 		ChangeMode(Mode.Playing);
+		
+		SetGameVar(kScore, 0);
+		SetGameVar(kCurrentLevel, 0);
+		SetGameVar(kCompletedRows, 0);
 	}
 	
 	void GameMode_Playing()

@@ -2216,6 +2216,7 @@ GameObject:
   - 224: {fileID: 280504732}
   - 222: {fileID: 280504734}
   - 114: {fileID: 280504733}
+  - 114: {fileID: 280504735}
   m_Layer: 5
   m_Name: ScoreValueText
   m_TagString: Untagged
@@ -2272,6 +2273,19 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 280504731}
+--- !u!114 &280504735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 280504731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 907d87ce35c487e40899fa2a0e65db39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VarWatched: Score
+  MainLoopGameObj: {fileID: 451203004}
 --- !u!1 &294609903
 GameObject:
   m_ObjectHideFlags: 0
@@ -3743,9 +3757,6 @@ MonoBehaviour:
   - {fileID: 480474, guid: 5df1fc938a3393b4b8370567efdf9af9, type: 2}
   LevelDropFrames: 2d00000028000000230000001e00000019000000140000000f0000000a0000000500000000000000
   RowsToLevelUp: 0a000000140000001e00000028000000320000003c00000046000000500000005a00000064000000
-  CurrentLevel: 0
-  CompletedRows: 0
-  Score: 0
   NextPiecePreviewLocation: {fileID: 614775556}
   StartLocation: {fileID: 345175963}
   TileContainer: {fileID: 263889790}
@@ -9200,6 +9211,7 @@ GameObject:
   - 224: {fileID: 1127917386}
   - 222: {fileID: 1127917388}
   - 114: {fileID: 1127917387}
+  - 114: {fileID: 1127917389}
   m_Layer: 5
   m_Name: LevelValueText
   m_TagString: Untagged
@@ -9256,6 +9268,19 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1127917385}
+--- !u!114 &1127917389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1127917385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 907d87ce35c487e40899fa2a0e65db39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VarWatched: CurrentLevel
+  MainLoopGameObj: {fileID: 451203004}
 --- !u!1 &1130570470
 GameObject:
   m_ObjectHideFlags: 0
@@ -14878,6 +14903,7 @@ GameObject:
   - 224: {fileID: 1876706596}
   - 222: {fileID: 1876706598}
   - 114: {fileID: 1876706597}
+  - 114: {fileID: 1876706599}
   m_Layer: 5
   m_Name: LinesValueText
   m_TagString: Untagged
@@ -14934,6 +14960,19 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1876706595}
+--- !u!114 &1876706599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1876706595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 907d87ce35c487e40899fa2a0e65db39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VarWatched: CompletedRows
+  MainLoopGameObj: {fileID: 451203004}
 --- !u!1 &1879059082
 GameObject:
   m_ObjectHideFlags: 0
