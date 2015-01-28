@@ -10,13 +10,30 @@ public interface IModeChanger
 public class MainLoop : MonoBehaviour
 {
 	#region vars
+	
+	public delegate void dGameVarWatcherFunc(int oldValue, int newValue);
+	
+	class GameVar
+	{
+		public int Value;
+		public List<dGameVarWatcherFunc> Watchers;
+		
+		public GameVar()
+		{
+			Value = 0;
+			Watchers = new List<dGameVarWatcherFunc>();
+		}
+	};
+	
+	Dictionary<string, GameVar> GameVars;
+	
+	public const string kCurrentLevel = "CurrentLevel";
+	public const string kCompletedRows = "CompletedRows";
+	public const string kScore = "Score";
+	
 	public Transform[] PiecePrefabs = new Transform[7];
 	public int[] LevelDropFrames = new int[10];
 	public int[] RowsToLevelUp = new int[9];
-	
-	public int CurrentLevel = 0;
-	public int CompletedRows = 0;
-	public int Score = 0;
 	
 	Transform CurrentFallingPiece = null;
 	Transform NextPiecePreview = null;
@@ -59,7 +76,15 @@ public class MainLoop : MonoBehaviour
 		Random.seed = (int)System.DateTime.Now.Ticks;
 		
 		InputHandlerScript = gameObject.GetComponent<InputHandler>();
+
+		InitGameModes();
+		InitGameVars();
 		
+		PauseMenu.SetActive(false);
+	}
+	
+	void InitGameModes()
+	{
 		GameMode = Mode.StartScreen;
 		
 		GameModeFuncs = new Dictionary<Mode, dGameModeFunc>();
@@ -76,14 +101,48 @@ public class MainLoop : MonoBehaviour
 		ModeChangers.Add(InputHandlerScript);
 		ModeChangers.Add(tmScript);
 		ModeChangers.Add(gScript);
-		
-		PauseMenu.SetActive(false);
 	}
-	#endregion // init
 	
+	void InitGameVars()
+	{
+		GameVars = new Dictionary<string, GameVar>();
+		
+		GameVars[kCurrentLevel] = new GameVar();
+		GameVars[kCompletedRows] = new GameVar();
+		GameVars[kScore] = new GameVar();
+	}
+	#endregion init
+
+	#region foo
+	void SetGameVar(string varName, int value)
+	{
+		if (GameVars.ContainsKey(varName))
+		{
+			int oldValue = GameVars[varName].Value;
+			GameVars[varName].Value = value;
+			
+			foreach (dGameVarWatcherFunc watcher in GameVars[varName].Watchers)
+			{
+				watcher(oldValue, value);
+			}
+		}
+	}
+	
+	bool GetGameVar(string varName, out int value)
+	{
+		value = 0;
+		bool exists = GameVars.ContainsKey(varName);
+		
+		if (exists)
+		{
+			value = GameVars[varName].Value;
+		}
+
+		return exists;
+	}
+	#endregion foo	
 	
 	#region clear rows	
-	
 	void RemoveFullRows(bool[] fullRows)
 	{
 		Grid grid = TileContainer.GetComponent<Grid>();
@@ -104,18 +163,27 @@ public class MainLoop : MonoBehaviour
 	
 	void ScoreFullRows(int fullRowCount)
 	{
-		Score += fullRowCount * 10;	// TODO -- better calculation.
+		int score = 0;
+		GetGameVar(kScore, out score);
+		SetGameVar(kScore, score + fullRowCount * 10);	// TODO -- better calculation.
 	}
 	
 	void HandleLevelUp(int fullRowCount)
 	{
-		CompletedRows += fullRowCount;
+		int rows = 0;
+		GetGameVar(kCompletedRows, out rows);
+		rows += fullRowCount;
+		SetGameVar(kCompletedRows, rows);
 		
-		if (CurrentLevel < RowsToLevelUp.Length)
+		int curLevel = 0;
+		GetGameVar(kCurrentLevel, out curLevel);
+		
+		if (curLevel < RowsToLevelUp.Length)
 		{
-			if (RowsToLevelUp[CurrentLevel] < CompletedRows)
+			if (RowsToLevelUp[curLevel] < rows)
 			{
-				CurrentLevel++;
+				curLevel++;
+				SetGameVar(kCurrentLevel, curLevel);
 			}
 		}
 	}
@@ -168,8 +236,10 @@ public class MainLoop : MonoBehaviour
 	void CreateRandomPiece()
 	{
 		int pieceIndex = Random.Range(0, PiecePrefabs.Length);
+		int curLevel = 0;
+		GetGameVar(kCurrentLevel, out curLevel);
 		
-		CreatePiece(LevelDropFrames[CurrentLevel], PiecePrefabs[pieceIndex]);
+		CreatePiece(LevelDropFrames[curLevel], PiecePrefabs[pieceIndex]);
 	}
 	
 	int PieceIndex = 0;
@@ -180,7 +250,9 @@ public class MainLoop : MonoBehaviour
 			PieceIndex = 0;
 		}
 		
-		CreatePiece(LevelDropFrames[CurrentLevel], PiecePrefabs[PieceIndex]);
+		int curLevel = 0;
+		GetGameVar(kCurrentLevel, out curLevel);
+		CreatePiece(LevelDropFrames[curLevel], PiecePrefabs[PieceIndex]);
 		PieceIndex++;
 	}
 	
