@@ -1,0 +1,5 @@
+Add script to each text element to be updated by code.
+Change main script to use dictionary of named values.
+each script on text elements knows which value it wants to watch.
+when game code updates value, registered watcher is called.
+(Dictionary knows which scripts watch which vars)
