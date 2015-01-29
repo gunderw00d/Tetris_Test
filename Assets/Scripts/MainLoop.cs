@@ -45,6 +45,7 @@ public class MainLoop : MonoBehaviour
 	
 	public GameObject PauseMenu;
 	public GameObject InfoPanel;
+	public GameObject StartScreen;
 
 	public delegate void dInputAction(float axisValue);
 	InputHandler InputHandlerScript;
@@ -81,6 +82,7 @@ public class MainLoop : MonoBehaviour
 		InitGameVars();
 		
 		PauseMenu.SetActive(false);
+		StartScreen.SetActive(true);
 	}
 	
 	void InitGameModes()
@@ -337,7 +339,7 @@ public class MainLoop : MonoBehaviour
 	
 	public void ExitPressed(float axisValue)
 	{
-		// TODO -- quit.
+		Application.Quit();
 	}
 	
 	public void PausePressed(float axisValue)
@@ -407,6 +409,8 @@ public class MainLoop : MonoBehaviour
 		SetGameVar(kScore, 0);
 		SetGameVar(kCurrentLevel, 0);
 		SetGameVar(kCompletedRows, 0);
+		
+		StartScreen.SetActive(false);
 	}
 	
 	void GameMode_Playing()
@@ -447,6 +451,7 @@ public class MainLoop : MonoBehaviour
 	
 	void GameMode_GameOver()
 	{
+		StartScreen.SetActive(true);
 	}
 	
 	#endregion game mode funcs
@@ -456,9 +461,6 @@ public class MainLoop : MonoBehaviour
 	{
 		// TODO list:
 		//
-		//	Game Modes - Exit.
-		//	Menus!
-		//	Display Score, lines, level.
 		//	Sound.
 		//	Swap preview piece.
 		

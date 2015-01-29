@@ -111,12 +111,11 @@ public class InputHandler : MonoBehaviour, IModeChanger
 		
 		
 		InputMaps[(int)MainLoop.Mode.StartScreen][kSubmit] = new InputData(MainLoopScript.StartPressed, DebounceInterval);
-		//InputMaps[(int)MainLoop.Mode.StartScreen]["Cancel"] = new InputData(MainLoopScript.ExitPressed, DebounceInterval);
-		
+		InputMaps[(int)MainLoop.Mode.StartScreen][kCancel] = new InputData(MainLoopScript.ExitPressed, DebounceInterval);
 		
 		
 		InputMaps[(int)MainLoop.Mode.GameOver][kSubmit] = new InputData(MainLoopScript.StartPressed, DebounceInterval);
-		//InputMaps[(int)MainLoop.Mode.GameOver]["Cancel"] = new InputData(MainLoopScript.ExitPressed, DebounceInterval);
+		InputMaps[(int)MainLoop.Mode.GameOver][kCancel] = new InputData(MainLoopScript.ExitPressed, DebounceInterval);
 		
 		ActiveMap = MainLoop.Mode.StartScreen;
 	}

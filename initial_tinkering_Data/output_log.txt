@@ -12,8 +12,9 @@ Platform assembly: C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_ti
 Loading C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
 Platform assembly: C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\UnityEngine.UI.dll (this message is harmless)
 Loading C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  0.116 seconds
+- Completed reload, in  0.118 seconds
 desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 Platform assembly: C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\Greg\Documents\Projects\Unity\Tetris_Test\initial_tinkering_Data\Managed\System.dll (this message is harmless)

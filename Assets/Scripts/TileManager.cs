@@ -8,16 +8,16 @@ public class TileManager : MonoBehaviour, IModeChanger
 	Transform[,] Tiles;
 #endregion // vars
 
-	public void AddTile(Transform tile, Vector3 loc, out int NumTilesInBuffer)
+	public bool AddTile(Transform tile, Vector3 loc)
 	{
-		NumTilesInBuffer = 0;
+		bool retVal = false;
 		int gridColumn = 0;
 		int gridRow = 0;
 		GridScript.TranslateCoordtoGridCell(loc.x, loc.y, out gridColumn, out gridRow);
 		
 		if (GridScript.InGirdBuffer(gridColumn, gridRow))
 		{
-			NumTilesInBuffer++;
+			retVal = true;
 		}
 		
 		Transform tileInstance = Instantiate(tile, loc, Quaternion.identity) as Transform;
@@ -26,6 +26,8 @@ public class TileManager : MonoBehaviour, IModeChanger
 		tileInstance.gameObject.transform.parent = gameObject.transform;
 		
 		GridScript.OccupyGridCell(gridColumn, gridRow);
+		
+		return retVal;
 	}
 	
 	public void ClearRow(int row)

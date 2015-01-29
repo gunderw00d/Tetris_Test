@@ -56,7 +56,10 @@ public class Drop : MonoBehaviour, IModeChanger
 			if (t.gameObject != gameObject)
 			{
 				Vector3 newLoc = transform.position + t.localPosition;
-				TileManagerScript.AddTile(IndividualTile, newLoc, out numTilesInBuffer);
+				if (TileManagerScript.AddTile(IndividualTile, newLoc))
+				{
+					numTilesInBuffer++;
+				}
 			}
 		}
 		
