@@ -46,6 +46,26 @@ public class Drop : MonoBehaviour, IModeChanger
 		return true;
 	}
 	
+	public bool WouldFit(Vector3 position)
+	{
+		Component[] tileXForms = gameObject.GetComponentsInChildren<Transform>();
+		
+		foreach (Transform t in tileXForms)
+		{
+			if (t.gameObject != gameObject)
+			{
+				Vector3 newLoc = position + t.localPosition;
+				
+				if (!GridScript.SpotOpen(newLoc))
+				{
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
 	public bool DecomposePiece()
 	{
 		Component[] tileXForms = gameObject.GetComponentsInChildren<Transform>();

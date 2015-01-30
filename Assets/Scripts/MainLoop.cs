@@ -65,6 +65,8 @@ public class MainLoop : MonoBehaviour
 	Dictionary<Mode, dGameModeFunc> GameModeFuncs;
 	
 	List<IModeChanger> ModeChangers;
+	
+	bool PieceSwapped;
 		
 	public bool DEBUG_DisableDrop = false;
 	public bool DEBUG_DisplayBuffer = false;
@@ -83,6 +85,8 @@ public class MainLoop : MonoBehaviour
 		
 		PauseMenu.SetActive(false);
 		StartScreen.SetActive(true);
+		
+		PieceSwapped = false;
 	}
 	
 	void InitGameModes()
@@ -243,6 +247,23 @@ public class MainLoop : MonoBehaviour
 		NextPiecePreview = newPiece;
 	}
 	
+	void SwapCurrentAndNext()
+	{
+		Transform tmp = NextPiecePreview;
+		NextPiecePreview = CurrentFallingPiece;
+		CurrentFallingPiece = tmp;
+		
+		Vector3 tmpLoc = NextPiecePreview.transform.position;
+		NextPiecePreview.transform.position = CurrentFallingPiece.transform.position;
+		CurrentFallingPiece.transform.position = tmpLoc;
+		
+		Drop nextPieceDropScript = NextPiecePreview.GetComponent<Drop>();
+		nextPieceDropScript.HoldInPlace = true;
+		
+		Drop currentPieceDropScript = CurrentFallingPiece.GetComponent<Drop>();
+		currentPieceDropScript.HoldInPlace = DEBUG_DisableDrop;
+	}
+	
 	void CreateRandomPiece()
 	{
 		int pieceIndex = Random.Range(0, PiecePrefabs.Length);
@@ -371,6 +392,22 @@ public class MainLoop : MonoBehaviour
 		PauseMenu.SetActive(false);
 	}
 	
+	public void SwapPressed(float axisValue)
+	{
+		if (PieceSwapped == false)
+		{
+			Drop nextPieceDropScript = NextPiecePreview.GetComponent<Drop>();
+			
+			bool canSwap = nextPieceDropScript.WouldFit(CurrentFallingPiece.transform.position);
+			
+			if (canSwap)
+			{
+				SwapCurrentAndNext();	
+				PieceSwapped = true;
+			}
+		}
+	}
+	
 	#endregion menu input
 	
 	void ChangeMode(Mode newMode)
@@ -442,6 +479,8 @@ public class MainLoop : MonoBehaviour
 			{
 				ClearCompleteLines();
 			}
+			
+			PieceSwapped = false;		// Allow further piece swaps.
 		}
 	}
 	

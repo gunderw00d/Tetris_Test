@@ -41,6 +41,11 @@ public class InputHandler : MonoBehaviour, IModeChanger
 	#region IModeChanger
 	public void ChangeMode(MainLoop.Mode newMode)
 	{
+		foreach (KeyValuePair<string, InputData> kvp in InputMaps[(int)ActiveMap])
+		{
+			InputMaps[(int)newMode][kvp.Key].mLastPressed = kvp.Value.mLastPressed;
+		}
+		
 		ActiveMap = newMode;
 	}
 	
@@ -104,7 +109,7 @@ public class InputHandler : MonoBehaviour, IModeChanger
 		InputMaps[(int)MainLoop.Mode.Playing][kHorizontal] = new InputData(MainLoopScript.MovePiece, DebounceInterval);
 		InputMaps[(int)MainLoop.Mode.Playing][kRotate] = new InputData(MainLoopScript.RotatePiece, DebounceInterval);
 		InputMaps[(int)MainLoop.Mode.Playing][kCancel] = new InputData(MainLoopScript.PausePressed, DebounceInterval);
-		
+		InputMaps[(int)MainLoop.Mode.Playing][kSubmit] = new InputData(MainLoopScript.SwapPressed, DebounceInterval);		
 		
 		InputMaps[(int)MainLoop.Mode.Paused][kSubmit] = new InputData(MainLoopScript.ResumePressed, DebounceInterval);				
 		InputMaps[(int)MainLoop.Mode.Paused][kCancel] = new InputData(MainLoopScript.ResumePressed, DebounceInterval);
