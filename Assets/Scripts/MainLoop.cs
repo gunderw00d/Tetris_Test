@@ -433,6 +433,7 @@ public class MainLoop : MonoBehaviour
 	
 	void GameMode_StartPlay()
 	{
+		audio.Play();
 		if (CurrentFallingPiece != null)
 		{
 			DestroyPiece(CurrentFallingPiece);
@@ -494,6 +495,7 @@ public class MainLoop : MonoBehaviour
 	
 	void GameMode_GameOver()
 	{
+		// TODO - Trigger GameOver sound
 		StartScreen.SetActive(true);
 	}
 	
